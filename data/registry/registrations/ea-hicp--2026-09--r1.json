@@ -1,0 +1,55 @@
+{
+  "fcreg": "0.1",
+  "id": "ea-hicp--2026-09--r1",
+  "series": {
+    "slug": "ea-hicp",
+    "title": "Euro area HICP, all-items, annual rate of change",
+    "dataset": "prc_hicp_minr",
+    "dims": {
+      "coicop18": "TOTAL",
+      "unit": "RCH_A",
+      "geo": "EA21"
+    },
+    "unit": "% (annual rate of change)",
+    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?coicop18=TOTAL&format=JSON&geo=EA21&lang=EN&unit=RCH_A"
+  },
+  "target": {
+    "period": "2026-09",
+    "release": {
+      "expected": "2026-10-01",
+      "calendar_source": "assumption: Eurostat's prc_hicp_minr HICP table posts a reference month's all-items annual rate on/around the first calendar day of the following month \u2014 empirically verified on 2026-09-01, when the 2026-08 value was already present in a fresh fetch. grace_days=30 absorbs calendar drift (weekends, holidays, revisions to the release calendar).",
+      "grace_days": 30
+    }
+  },
+  "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+  "engine": {
+    "name": "timesfm",
+    "version": "3.0.0",
+    "checkpoint": "google/timesfm-2.5-200m-pytorch",
+    "context_span": "2000-12..2026-08",
+    "data_cutoff": "2026-08"
+  },
+  "forecast": {
+    "deciles": {
+      "0.1": 2.7919580936431885,
+      "0.2": 2.9774913787841797,
+      "0.3": 3.0623509883880615,
+      "0.4": 3.129940986633301,
+      "0.5": 3.1994895935058594,
+      "0.6": 3.261514902114868,
+      "0.7": 3.3296971321105957,
+      "0.8": 3.422785997390747,
+      "0.9": 3.6140167713165283
+    }
+  },
+  "baselines": {
+    "naive": {
+      "point": 3.2
+    },
+    "rw_drift": {
+      "point": 3.2019480519480523
+    }
+  },
+  "created_utc": "2026-09-01T17:39:42Z",
+  "sha256": "757cd251ca0003bf2c2c170c561b655767694263b0df8bb21fadc5ceaedc09cb"
+}

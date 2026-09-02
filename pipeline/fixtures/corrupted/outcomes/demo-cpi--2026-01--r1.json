@@ -1,0 +1,29 @@
+{
+  "id": "demo-cpi--2026-01--r1",
+  "verdict": "SCORED",
+  "reason": null,
+  "outturn": {
+    "value": 101,
+    "fetched_utc": "2026-02-16T09:00:00Z",
+    "vintage_note": "first-published estimate, 2026-02-16 release"
+  },
+  "metrics": {
+    "pinball_mean": 1.5,
+    "pinball_by_decile": {
+      "0.1": 1.1,
+      "0.2": 1.8,
+      "0.3": 2.1,
+      "0.4": 2.0,
+      "0.5": 1.5,
+      "0.6": 0.6,
+      "0.7": 0.30000000000000004,
+      "0.8": 0.5999999999999999,
+      "0.9": 0.4999999999999999
+    },
+    "interval80_hit": true,
+    "abs_err_median": 3,
+    "naive_abs_err": 6,
+    "rw_drift_abs_err": 4
+  },
+  "scored_utc": "2026-02-16T09:05:00Z"
+}

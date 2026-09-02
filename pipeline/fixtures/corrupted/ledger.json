@@ -1,0 +1,172 @@
+{
+  "generated_utc": "2026-04-15T00:10:00Z",
+  "registrations": [
+    {
+      "fcreg": "0.1",
+      "id": "demo-cpi--2026-01--r1",
+      "series": {
+        "slug": "demo-cpi",
+        "title": "Demo CPI (fixture)",
+        "dataset": "demo_dataset",
+        "dims": {
+          "geo": "XX",
+          "unit": "PCH"
+        },
+        "unit": "index points",
+        "source_url": "https://example.invalid/api/demo_dataset?geo=XX&unit=PCH"
+      },
+      "target": {
+        "period": "2026-01",
+        "release": {
+          "expected": "2026-02-15",
+          "calendar_source": "https://example.invalid/calendar",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "1.2.3",
+        "checkpoint": "google/timesfm-1.0-200m",
+        "context_span": "2015-01..2025-12",
+        "data_cutoff": "2025-12-31"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 90,
+          "0.2": 92,
+          "0.3": 94,
+          "0.4": 96,
+          "0.5": 98,
+          "0.6": 100,
+          "0.7": 102,
+          "0.8": 104,
+          "0.9": 106
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 95
+        },
+        "rw_drift": {
+          "point": 97
+        }
+      },
+      "created_utc": "2026-01-05T00:00:00Z",
+      "sha256": "ab3da55beeee7b8e638db6d0ee996882ac3c8538a8baac3d1acfff6a25be28e8"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "demo-cpi--2026-02--r1",
+      "series": {
+        "slug": "demo-cpi",
+        "title": "Demo CPI (fixture)",
+        "dataset": "demo_dataset",
+        "dims": {
+          "geo": "XX",
+          "unit": "PCH"
+        },
+        "unit": "index points",
+        "source_url": "https://example.invalid/api/demo_dataset?geo=XX&unit=PCH"
+      },
+      "target": {
+        "period": "2026-02",
+        "release": {
+          "expected": "2026-03-15",
+          "calendar_source": "https://example.invalid/calendar",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "1.2.3",
+        "checkpoint": "google/timesfm-1.0-200m",
+        "context_span": "2015-01..2026-01",
+        "data_cutoff": "2026-01-31"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 88,
+          "0.2": 90,
+          "0.3": 92,
+          "0.4": 94,
+          "0.5": 96,
+          "0.6": 98,
+          "0.7": 100,
+          "0.8": 102,
+          "0.9": 104
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 93
+        },
+        "rw_drift": {
+          "point": 95
+        }
+      },
+      "created_utc": "2026-02-05T00:00:00Z",
+      "sha256": "127053550da823511dcfa9a6038c2b840b993bb64afde584c89fa7f3295b0244"
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "demo-cpi--2026-01--r1",
+      "verdict": "SCORED",
+      "reason": null,
+      "outturn": {
+        "value": 101,
+        "fetched_utc": "2026-02-16T09:00:00Z",
+        "vintage_note": "first-published estimate, 2026-02-16 release"
+      },
+      "metrics": {
+        "pinball_mean": 1.5,
+        "pinball_by_decile": {
+          "0.1": 1.1,
+          "0.2": 1.8,
+          "0.3": 2.1,
+          "0.4": 2.0,
+          "0.5": 1.5,
+          "0.6": 0.6,
+          "0.7": 0.30000000000000004,
+          "0.8": 0.5999999999999999,
+          "0.9": 0.4999999999999999
+        },
+        "interval80_hit": true,
+        "abs_err_median": 3,
+        "naive_abs_err": 6,
+        "rw_drift_abs_err": 4
+      },
+      "scored_utc": "2026-02-16T09:05:00Z"
+    },
+    {
+      "id": "demo-cpi--2026-02--r1",
+      "verdict": "UNEVALUABLE",
+      "reason": "late",
+      "outturn": null,
+      "metrics": null,
+      "scored_utc": "2026-04-15T00:00:00Z"
+    }
+  ],
+  "corrections": [
+    {
+      "correction_id": "demo-cpi--2026-01--r1--c1",
+      "registration_id": "demo-cpi--2026-01--r1",
+      "dated": "2026-02-20",
+      "note": "Source republished a revised vintage of 2026-01 on 2026-02-20; vintage_policy means the first-fetch value already used for scoring stands and this does not reopen the SCORED verdict above. Logged for transparency only, per the append-only corrections rule."
+    }
+  ],
+  "stats": {
+    "n_open": 0,
+    "n_scored": 2,
+    "n_unevaluable": 1,
+    "coverage80": {
+      "empirical": 1.0,
+      "nominal": 0.8
+    },
+    "mean_pinball_by_series": {
+      "demo-cpi": 1.1666666666666667
+    }
+  }
+}

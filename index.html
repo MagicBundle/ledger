@@ -1,0 +1,1892 @@
+<meta charset="utf-8">
+<title>Ledger</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<style>
+/* ===== chassis.css (shared) ===== */
+/* =====================================================================
+ * suite/chassis/chassis.css
+ * The shared page chassis for the STEM instruments suite.
+ *
+ * Extracted verbatim-in-spirit from the three shipped pages
+ *   repulsion/page/body.html  (zeta zeros / GUE)
+ *   arctic/page/body.html     (Aztec diamond)
+ *   fever/page/body.html      (Ising model)
+ * after three review rounds.  What lives here is what all three copied
+ * byte-for-byte; per-page series/accent colours are documented below as
+ * SLOTS a page overrides, not baked in.
+ *
+ * Concatenation recipe (see README.md): a page's <style> is
+ *   chassis.css   +   the page's own :root{ ...series slots... }   +
+ *   any page-specific component CSS (panels, lensbox, filmstrip, ...).
+ * The page block comes AFTER chassis.css so its slot overrides win.
+ * ===================================================================== */
+
+/* ---------------------------------------------------------------------
+ * 1 · STRUCTURAL PALETTE  — identical across all three pages.
+ *     Light is defined on bare :root.  Dark is redefined twice: once
+ *     under prefers-color-scheme guarded by :not([data-theme="light"])
+ *     so an explicit light choice wins over the OS, and once under
+ *     [data-theme="dark"] so an explicit dark toggle wins either way.
+ *     Never give any token its ONLY definition inside a media block.
+ * ------------------------------------------------------------------- */
+:root{
+  --bg:#F2F3F5; --bg2:#E9EBEF; --card:#FFFFFF;
+  --ink:#15181F; --ink2:#5E6472;
+  /* --ink3 is the WCAG-AA correction shipped in Fever.  Repulsion and
+   * Arctic first used #9AA1AE, which fell below the 3:1 non-text / 4.5:1
+   * text floor on --card; Fever darkened it to #7D8088 (light) and kept
+   * a matching dark-mode value.  This is the value the suite standardises on. */
+  --ink3:#7D8088;
+  --line:#D3D7DE;
+  --acc:#2F5AA8; --acc-soft:#DDE6F5;
+
+  /* shared reference-mark + control tokens (Fever + Arctic use all four;
+   * Repulsion needs none of them, but they are structural, not series) */
+  --curve:#15181F;                 /* the exact/theory curve, ink-strong */
+  --ctl:#8A8A93;                   /* a muted control / secondary line   */
+  --ctl-soft:#E4E2E6;              /* fill behind a control / shaded band */
+
+  /* the LIVE / EXACT / STORED / NUMERICAL vocabulary is suite-wide, so its
+   * chip colours are chassis tokens, NOT page series slots.  (Fever wired
+   * these to its --meas / --acc / --eye; naming them here frees the chips
+   * from any one page's palette.) */
+  --live:#157F7A;                  /* measured in-browser, right now */
+  --exact:#2F5AA8;                 /* closed form of the infinite system */
+  --numerical:#6A3EA1;             /* literature value, no closed form */
+  /* STORED reuses --ink3 (a neutral, "from the recorded run") */
+
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --bg2:#0B0D10; --card:#0E1013;
+  --ink:#C9D4DD; --ink2:#8A96A5; --ink3:#6E7A88; --line:#232A34;
+  --acc:#86AEEC; --acc-soft:#182233;
+  --curve:#FFFFFF; --ctl:#7C7691; --ctl-soft:#262430;
+  --live:#58C6C0; --exact:#86AEEC; --numerical:#C4A0EE;
+}}
+:root[data-theme="dark"]{
+  --bg:#000000; --bg2:#0B0D10; --card:#0E1013;
+  --ink:#C9D4DD; --ink2:#8A96A5; --ink3:#6E7A88; --line:#232A34;
+  --acc:#86AEEC; --acc-soft:#182233;
+  --curve:#FFFFFF; --ctl:#7C7691; --ctl-soft:#262430;
+  --live:#58C6C0; --exact:#86AEEC; --numerical:#C4A0EE;
+}
+
+/* ---------------------------------------------------------------------
+ * 2 · PAGE SERIES SLOTS  — placeholders only; OVERRIDE PER PAGE.
+ *     Each page defines its own data-series accents after chassis.css,
+ *     in BOTH light and the two dark blocks, and lists them in its
+ *     readColors() VARS.  The neutral fallbacks below keep an
+ *     un-themed page legible rather than transparent.
+ *
+ *     What each page actually defines (for reference):
+ *       Repulsion : --zeta --gue --poi
+ *       Arctic    : --ns --ns2 --ew --ew2 --play
+ *       Fever     : --up --down --fever --meas --play --eye
+ *
+ *     --play (the "you"/human colour in a game) recurs in Arctic + Fever,
+ *     so it is given a real default here; the rest are page-specific.
+ * ------------------------------------------------------------------- */
+:root{
+  --play:#7A3FA8;                  /* the human player's colour (>=2 pages) */
+  --s1:#2F5AA8; --s2:#157F7A; --s3:#A34D62; --s4:#A8681C;  /* generic slots */
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --play:#C78BE8;
+  --s1:#86AEEC; --s2:#58C6C0; --s3:#D07C8F; --s4:#E5B267;
+}}
+:root[data-theme="dark"]{
+  --play:#C78BE8;
+  --s1:#86AEEC; --s2:#58C6C0; --s3:#D07C8F; --s4:#E5B267;
+}
+
+/* ---------------------------------------------------------------------
+ * 3 · DOCUMENT SKELETON
+ * ------------------------------------------------------------------- */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.5;padding:0 20px 96px}
+.wrap{max-width:920px;margin:0 auto}
+
+h1{font-family:var(--serif);font-weight:300;font-size:4.4rem;letter-spacing:-.01em;line-height:1;margin:72px 0 18px;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:400;font-size:1.7rem;line-height:1.2;margin:0 0 6px;text-wrap:balance}
+h3{font-family:var(--sans);font-weight:600;font-size:.92rem;letter-spacing:.01em;margin:26px 0 0}
+p{max-width:64ch;margin:.6em 0}
+.lede{font-size:1.3rem;font-weight:300;max-width:56ch;color:var(--ink);line-height:1.35}
+.lede i{font-style:italic}
+.eyebrow{font-family:var(--sans);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);font-weight:500}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+section{margin-top:72px;padding-top:28px;border-top:1px solid var(--line)}
+.inst{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 20px 16px;margin-top:18px}
+canvas{display:block;width:100%}
+
+/* ---------------------------------------------------------------------
+ * 4 · ROW / LABEL / CAPTION
+ * ------------------------------------------------------------------- */
+.row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.lab{font-family:var(--sans);font-size:.82rem;font-weight:500;letter-spacing:.02em}
+/* colour a label by adding a page class, e.g. .lab.f{color:var(--fever)} */
+.sub{font-family:var(--sans);font-size:.78rem;color:var(--ink2)}
+.sub b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.cap{font-family:var(--sans);font-size:.78rem;color:var(--ink2);margin-top:10px;max-width:78ch}
+.cap b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+/* ---------------------------------------------------------------------
+ * 5 · LEGEND  (line / dashed-theory / dot / ring / swatch variants)
+ * ------------------------------------------------------------------- */
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--sans);font-size:.8rem;color:var(--ink2);margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:18px;height:2px;vertical-align:middle;margin-right:7px;background:currentColor}
+.legend .th::before{height:0;border-top:2px dashed currentColor}
+.legend .dot::before{width:9px;height:9px;border-radius:50%}
+.legend .ring::before{width:9px;height:9px;border-radius:50%;background:transparent;border:2px solid currentColor;box-sizing:content-box}
+.legend.sw span::before{width:22px;height:12px;border-radius:2px;vertical-align:-2px;border:1px solid var(--ink3)}
+/* semantic colour helpers a page may reuse; series colours (.z .g .ns …)
+ * are added by the page's own CSS block */
+.legend .k{color:var(--curve)}.legend .c{color:var(--ctl)}
+.legend .a{color:var(--acc)}.legend .pl{color:var(--play)}
+
+/* ---------------------------------------------------------------------
+ * 6 · CONTROLS  (buttons, selects, range, focus ring)
+ * ------------------------------------------------------------------- */
+button,select{font-family:var(--sans);font-size:.82rem;font-weight:500;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:3px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--ink3)}
+button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button.primary{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+button[disabled]{opacity:.5;cursor:default}
+.ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+
+/* ---------------------------------------------------------------------
+ * 7 · DIAL  (a slider paired with a big monospace read-out + tick marks)
+ * ------------------------------------------------------------------- */
+.dial{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin-top:8px}
+.dial .big{font-family:var(--mono);font-size:2.4rem;line-height:1;font-weight:400;white-space:nowrap}
+.marks{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;font-family:var(--sans);font-size:.74rem;color:var(--ink2);margin-top:4px}
+.marks b{font-weight:500;color:var(--ink)}
+
+/* ---------------------------------------------------------------------
+ * 8 · TAG CHIPS  — the suite's LIVE / EXACT / STORED / NUMERICAL vocabulary
+ * ------------------------------------------------------------------- */
+.tag{font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:2px;padding:1px 6px;color:var(--ink2);white-space:nowrap;max-width:100%}
+.tag.live{border-color:var(--live);color:var(--live)}
+.tag.exact{border-color:var(--exact);color:var(--exact)}
+.tag.stored{border-color:var(--ink3)}
+.tag.numerical{border-color:var(--numerical);color:var(--numerical)}
+@media (max-width:820px){.tag{white-space:normal}}
+
+/* ---------------------------------------------------------------------
+ * 9 · GAME  (verdict line, score row)
+ * ------------------------------------------------------------------- */
+.game .verdict,.verdict{margin-top:12px;min-height:2.6em;font-size:1.02rem}
+.game .verdict{min-height:3.2em}
+.score{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px;font-family:var(--sans);font-size:.85rem;color:var(--ink2)}
+.score b{font-family:var(--mono);color:var(--ink);font-weight:500;font-size:1.05rem}
+.score .pl b{color:var(--play)}
+/* the Repulsion/Fever multiple-choice card, reused where a game offers picks */
+.game .choice{display:block;width:100%;background:transparent;border:1px solid var(--line);border-radius:4px;padding:10px 12px 6px;margin-top:10px;text-align:left;cursor:pointer}
+.game .choice:hover{border-color:var(--ink3)}
+.game .choice .lab{color:var(--ink2)}
+.game .choice.correct{border-color:var(--live)}
+.game .choice.wrong{border-color:var(--numerical)}
+.game .choice[disabled]{cursor:default}
+
+/* ---------------------------------------------------------------------
+ * 10 · FOOT / PROVENANCE + the visually-hidden helper
+ * ------------------------------------------------------------------- */
+.foot{font-size:.9rem;color:var(--ink2);max-width:70ch}
+.foot a{color:inherit}
+.foot b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* Bare button: strips native chrome so an inline-looking control can still
+ * be a real <button> (keyboard + AT reachable).  from: sunflower review —
+ * the .marks landmark shortcuts had to become buttons and each page was
+ * re-declaring this reset.  Add your own look on top; keyboard focus still
+ * gets the shared :focus-visible ring below. */
+.btn-bare{background:none;border:0;margin:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:inherit}
+.btn-bare:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+
+/* ---------------------------------------------------------------------
+ * 11 · RESPONSIVE + reduced motion
+ * ------------------------------------------------------------------- */
+@media (max-width:640px){
+  h1{font-size:3rem}
+  body{font-size:17px}
+  .inst{padding:14px}
+  .dial{grid-template-columns:1fr}
+  .dial .big{font-size:2rem}
+}
+@media (prefers-reduced-motion: reduce){.nomotion{display:none}}
+
+
+/* ===== page-specific (slots override chassis) ===== */
+/* ===================================================================== *
+ * Ledger — page-specific CSS. Concatenated AFTER chassis.css by build.js,
+ * so these :root slot overrides win. Structural palette, skeleton,
+ * controls, tags, legend, table all come from chassis.css; only the
+ * THIRD tag kind ("measured" — the house doctrine's fetched-outturn
+ * label, alongside chassis's existing "stored"/"live"), the verdict
+ * chips (OPEN/SCORED/UNEVALUABLE), and the decile-fan SVG live here.
+ *
+ * The fan charts are inline SVG coloured entirely with var(--token)
+ * fills/strokes, so a theme flip repaints them for free via CSS — unlike
+ * phantom's canvas panels, nothing here needs a JS redraw-on-theme hook.
+ * ===================================================================== */
+:root{
+  --measured:#A8681C;      /* light: a fetched, real-world outturn (warm amber) */
+  --verdict-scored:#157F7A;    /* reuses chassis --live hue: a concluded, graded verdict */
+  --verdict-unevaluable:#A34D62; /* reuses chassis --s3 hue: terminal, not a failure */
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --measured:#E5B267;
+  --verdict-scored:#58C6C0;
+  --verdict-unevaluable:#D07C8F;
+}}
+:root[data-theme="dark"]{
+  --measured:#E5B267;
+  --verdict-scored:#58C6C0;
+  --verdict-unevaluable:#D07C8F;
+}
+
+.tag.measured{border-color:var(--measured);color:var(--measured)}
+.tag.mismatch{border-color:var(--verdict-unevaluable);color:var(--verdict-unevaluable);font-weight:600}
+
+/* .stats is NOT a chassis.css component (every sibling page defines it
+ * itself); copied here in the same shape phantom/arctic/fever use. */
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px;font-family:var(--sans);font-size:.8rem;color:var(--ink2)}
+.stats span{max-width:38ch}
+.stats b{font-family:var(--mono);color:var(--ink);font-weight:500;font-size:1.02rem;display:block}
+.stats .sub{display:block;margin-top:2px}
+.stats .sub b{display:inline;font-size:inherit}
+
+/* ---- verdict chips (OPEN / SCORED / UNEVALUABLE) ---- */
+.vchip{font-family:var(--sans);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;
+  border:1px solid;border-radius:12px;padding:2px 10px;white-space:nowrap;font-weight:500}
+.vchip.open{border-color:var(--ink3);color:var(--ink3)}
+.vchip.scored{border-color:var(--verdict-scored);color:var(--verdict-scored)}
+.vchip.unevaluable{border-color:var(--verdict-unevaluable);color:var(--verdict-unevaluable)}
+
+/* ---- registration cards + decile fan ---- */
+.stack{display:flex;flex-direction:column;gap:16px;margin-top:18px}
+.regcard .row{align-items:flex-start}
+.regcard .subline{font-family:var(--sans);font-size:.78rem;color:var(--ink2);margin-top:2px}
+.fanwrap{margin:14px 0 4px}
+.fanwrap svg{display:block;width:100%;height:auto;overflow:visible}
+.fan-band{fill:var(--acc)}
+.fan-band-0{opacity:.14}
+.fan-band-1{opacity:.24}
+.fan-band-2{opacity:.38}
+.fan-band-3{opacity:.58}
+.fan-axis{stroke:var(--ink3);stroke-width:1}
+.fan-tick{stroke:var(--ink3);stroke-width:1}
+.fan-median-line{stroke:var(--acc);stroke-width:2}
+.fan-median-dot{fill:var(--acc)}
+.fan-naive-line{stroke:var(--ink3);stroke-width:1.4;stroke-dasharray:3 2}
+.fan-rw-line{stroke:var(--numerical, var(--s1));stroke-width:1.4;stroke-dasharray:1 2}
+.fan-label{font:500 10px var(--mono);fill:var(--ink2)}
+.fan-label.strong{fill:var(--ink);font-weight:600}
+.fan-target{font:500 10px var(--mono);fill:var(--ink2)}
+.fanlegend{margin-top:2px}
+.fanlegend .sw-median::before{background:var(--acc)}
+.fanlegend .sw-naive::before{content:"";display:inline-block;width:14px;border-top:1.4px dashed var(--ink3);margin-right:7px;vertical-align:middle}
+.fanlegend .sw-rw::before{content:"";display:inline-block;width:14px;border-top:1.4px dashed var(--s1, var(--numerical));margin-right:7px;vertical-align:middle}
+
+.hashbtn{font-family:var(--mono);font-size:.76rem;color:var(--ink2);background:var(--bg2);
+  border:1px solid var(--line);border-radius:3px;padding:4px 9px;cursor:pointer}
+.hashbtn:hover{border-color:var(--ink3);color:var(--ink)}
+@media (pointer:coarse){.hashbtn{padding:9px 12px}}
+
+/* ---- scoreboard: the deliberate empty state ---- */
+.empty-scoreboard{font-family:var(--sans);font-size:1.05rem;font-weight:500;color:var(--ink);
+  letter-spacing:.01em;margin:6px 0 2px}
+.empty-scoreboard .n{color:var(--verdict-scored);font-family:var(--mono)}
+.gradelist{list-style:none;margin:10px 0 0;padding:0;font-family:var(--sans);font-size:.85rem;color:var(--ink2)}
+.gradelist li{padding:5px 0;border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.gradelist li:last-child{border-bottom:0}
+.gradelist b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+.covbar{position:relative;height:10px;background:var(--bg2);border-radius:5px;overflow:visible;margin:10px 0 4px;max-width:420px}
+.covbar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--verdict-scored);border-radius:5px}
+.covbar .nominal{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+
+table.led{border-collapse:collapse;font-family:var(--sans);font-size:.78rem;margin-top:10px;width:100%}
+table.led th,table.led td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.led th{color:var(--ink2);font-weight:500}
+table.led td.n{font-family:var(--mono);white-space:nowrap}
+table.led td.hash{font-family:var(--mono);color:var(--ink2)}
+@media (max-width:700px){
+  table.led,table.led tbody,table.led tr,table.led td,table.led th{display:block;width:100%}
+  /* Hide the header via its OWN element, not ":first-child" -- that
+   * selector matches per-parent, so on a table with a <thead>, the
+   * tbody's genuinely first DATA row is ALSO a first-child (of tbody)
+   * and would be silently hidden right along with the header row. Caught
+   * live: on a narrow viewport this ate the append-only ledger's oldest
+   * registration entirely. */
+  table.led thead{display:none}
+  table.led tr{border-bottom:1px solid var(--line);padding:8px 0}
+  table.led td{border:0;padding:2px 0}
+  table.led td::before{content:attr(data-col) ": ";color:var(--ink2)}
+}
+
+.notebox{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--acc);
+  border-radius:3px;padding:12px 16px;margin:16px 0;font-family:var(--sans);font-size:.86rem;
+  color:var(--ink2);max-width:74ch}
+.notebox b{color:var(--ink);font-weight:600}
+.formula{font-family:var(--mono);font-size:.92rem;background:var(--bg2);border:1px solid var(--line);
+  border-radius:3px;padding:10px 14px;margin:10px 0;overflow-x:auto;white-space:pre}
+
+@media (max-width:640px){
+  .fanwrap svg{overflow:hidden}
+}
+</style>
+
+<div class="wrap">
+<div class="eyebrow" style="margin-top:64px">An instrument · pre-registered forecasts · graded in public</div>
+<h1>Ledger</h1>
+<p class="lede">The forecast that grades itself.</p>
+<p>Every forecast below is <b>pre-registered</b>: committed as an immutable, hash-stamped JSON file <i>before</i> the target period's data exists, then graded in public once it arrives. A verdict is either <b>SCORED</b> or <b>UNEVALUABLE</b> — and UNEVALUABLE is terminal: late beyond its grace window, discontinued, redefined, or vintage-conflicted, it can never later become SCORED. Any correction is appended, dated, alongside the original — never edited into it. This page runs <b>no backtests, ever</b>: a foundation forecaster's pretraining can already contain the very history a backtest would score it against, so a backtest proves nothing about forward skill on data the model may have already seen — only real, dated precedence, committed before the fact, can.</p>
+<noscript><p class="foot">This page needs JavaScript to render the registry, compute the scoreboard, and run its self-test — nothing here is server-rendered.</p></noscript>
+
+<!-- ============================================================ I -->
+<section>
+<div class="eyebrow">I · Open registrations</div>
+<h2>Committed before the data exists</h2>
+<p>Each series below carries a <b>decile forecast fan</b> — nine quantiles (0.1 through 0.9) registered for the next unpublished period, before that period's number exists anywhere. The shaded bands nest the 80/60/40% intervals around the <span class="fan-median-swatch">median</span>; the dashed lines mark this cycle's two registered baselines (naive: last observed value; rw-drift: naive plus the recent trend) for comparison once grading happens. Every number on a card is <span class="tag stored">stored</span> — committed at the timestamp shown, hash-stamped, and re-verified live in your browser against that hash below each card.</p>
+<div class="stack" id="regCards"><p class="foot">Loading registry…</p></div>
+</section>
+
+<!-- ============================================================ II -->
+<section>
+<div class="eyebrow">II · Scoreboard</div>
+<h2>Graded in public</h2>
+<p>Once a target period's data is published, its registration is scored: pinball loss across all nine deciles, whether the 80% interval actually contained the outturn, and the median forecast's absolute error against the two registered baselines. Everything below is <span class="tag live">live</span> — computed in your browser, right now, from the registry embedded in this page, by the same scoring kernel shipped in <code>ledger.js</code> and covered by the self-test in section IV.</p>
+<div class="inst" id="scoreboard"><p class="foot">Computing…</p></div>
+</section>
+
+<!-- ============================================================ III -->
+<section>
+<div class="eyebrow">III · The ledger</div>
+<h2>Append-only</h2>
+<p>Every registration this instrument has ever committed, in one table, oldest first. Nothing here is ever deleted or rewritten — a wrong forecast stays visible exactly as filed; only <b>corrections</b> (below the table, dated, appended) can add context after the fact.</p>
+<div class="inst">
+<div class="tablewrap" style="overflow-x:auto">
+<table class="led" id="ledgerTable">
+  <thead><tr><th>ID</th><th>Series</th><th>Target</th><th>Committed</th><th>SHA-256</th><th>Status</th></tr></thead>
+  <tbody id="ledgerRows"></tbody>
+</table>
+</div>
+</div>
+<h3>Corrections</h3>
+<div id="correctionsList" class="foot">Loading…</div>
+</section>
+
+<!-- ============================================================ IV -->
+<section>
+<div class="eyebrow">IV · Method &amp; self-test</div>
+<h2>How scoring works</h2>
+<p>Pinball (quantile) loss scores one decile <i>q</i> against the realised outturn <i>y</i> and the registered forecast <i>f<sub>q</sub></i>:</p>
+<div class="formula">L_q(y, f_q) = (y − f_q)·q          if y ≥ f_q
+            = (f_q − y)·(1 − q)    otherwise</div>
+<p><code>pinball_mean</code> is the average of <i>L<sub>q</sub></i> over all nine registered deciles. <code>interval80_hit</code> is true iff <i>f<sub>0.1</sub> ≤ y ≤ f<sub>0.9</sub></i> — whether the registered 80% interval actually contained what happened. <code>abs_err_median</code> is <i>|y − f<sub>0.5</sub>|</i>, reported alongside the naive and random-walk-with-drift baselines' own absolute errors (never pooled into one "skill score" — a point-forecast absolute error and a nine-decile pinball mean are not the same unit, so they are shown side by side, not divided into each other).</p>
+<p class="notebox"><b>Vintage policy (verbatim).</b> "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict." A statistical office restating an old quarter's figure next year does not reopen last year's already-SCORED verdict — the number that was live on the day this instrument checked is the number that gets graded, permanently.</p>
+<h3 style="margin-top:22px">Self-test</h3>
+<p class="foot">Re-verify, right now, in this browser: the pinball-loss closed forms, the interval-hit boundary cases, the canonical-JSON + SHA-256 hash (round-trip <i>and</i> tamper detection), the registry aggregates on a synthetic mini-registry, and — using the real embedded registry, not a synthetic stand-in — that every registration's <code>sha256</code> field genuinely matches a fresh hash of its own fields.</p>
+<div class="inst">
+  <div class="ctrl"><button type="button" id="selfTestBtn">Run self-test</button><span class="sub" id="selfTestSummary">Not run yet.</span></div>
+  <div class="foot" id="selfTestOut" role="status" aria-live="polite" style="margin-top:12px;white-space:pre-wrap;font-family:var(--mono);font-size:.78rem"></div>
+</div>
+<h3>What is stored, measured, live</h3>
+<p class="foot"><span class="tag stored">stored</span> — registered and committed: the forecast deciles, the baselines, the engine/checkpoint, the hash. Written once, at registration time, and never edited. <span class="tag measured">measured</span> — a fetched outturn: the real-world number, once published, that a registration is graded against. <span class="tag live">live</span> — computed in your browser from the embedded registry at the moment this page renders: every scoreboard aggregate, every hash re-verification, every self-test result.</p>
+<p class="foot">Registry: <a href="https://github.com/MagicBundle/ledger" rel="noopener">github.com/MagicBundle/ledger</a> — every registration, outcome and correction is a public commit. The repository's commit graph, not any field inside a file, is the timestamp that makes a forecast pre-registered.</p>
+<p class="foot">Contact the author: <a href="mailto:info@iterativeintelligence.io">info@iterativeintelligence.io</a></p>
+</section>
+</div>
+
+<script id="registryData" type="application/json">
+{
+  "generated_utc": "2026-09-01T17:57:12Z",
+  "registrations": [
+    {
+      "fcreg": "0.1",
+      "id": "ea-hicp--2026-09--r1",
+      "series": {
+        "slug": "ea-hicp",
+        "title": "Euro area HICP, all-items, annual rate of change",
+        "dataset": "prc_hicp_minr",
+        "dims": {
+          "coicop18": "TOTAL",
+          "unit": "RCH_A",
+          "geo": "EA21"
+        },
+        "unit": "% (annual rate of change)",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?coicop18=TOTAL&format=JSON&geo=EA21&lang=EN&unit=RCH_A"
+      },
+      "target": {
+        "period": "2026-09",
+        "release": {
+          "expected": "2026-10-01",
+          "calendar_source": "assumption: Eurostat's prc_hicp_minr HICP table posts a reference month's all-items annual rate on/around the first calendar day of the following month — empirically verified on 2026-09-01, when the 2026-08 value was already present in a fresh fetch. grace_days=30 absorbs calendar drift (weekends, holidays, revisions to the release calendar).",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "2000-12..2026-08",
+        "data_cutoff": "2026-08"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 2.7919580936431885,
+          "0.2": 2.9774913787841797,
+          "0.3": 3.0623509883880615,
+          "0.4": 3.129940986633301,
+          "0.5": 3.1994895935058594,
+          "0.6": 3.261514902114868,
+          "0.7": 3.3296971321105957,
+          "0.8": 3.422785997390747,
+          "0.9": 3.6140167713165283
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 3.2
+        },
+        "rw_drift": {
+          "point": 3.2019480519480523
+        }
+      },
+      "created_utc": "2026-09-01T17:39:42Z",
+      "sha256": "757cd251ca0003bf2c2c170c561b655767694263b0df8bb21fadc5ceaedc09cb"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "ea-unemp--2026-08--r1",
+      "series": {
+        "slug": "ea-unemp",
+        "title": "Euro area unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "EA21",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=EA21&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-30",
+          "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "2000-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 6.324240207672119,
+          "0.2": 6.3573408126831055,
+          "0.3": 6.368929386138916,
+          "0.4": 6.373193740844727,
+          "0.5": 6.398936748504639,
+          "0.6": 6.4229736328125,
+          "0.7": 6.4230756759643555,
+          "0.8": 6.439525604248047,
+          "0.9": 6.493844032287598
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 6.4
+        },
+        "rw_drift": {
+          "point": 6.3902515723270445
+        }
+      },
+      "created_utc": "2026-09-01T17:35:21Z",
+      "sha256": "0363a37d061dc961c46063f939cd6d04e448a533d9f1c0af8f1fc3d7c2c94d65"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-debt--2026-Q2--r1",
+      "series": {
+        "slug": "lu-debt",
+        "title": "Luxembourg general government gross debt",
+        "dataset": "gov_10q_ggdebt",
+        "dims": {
+          "geo": "LU",
+          "sector": "S13",
+          "na_item": "GD",
+          "unit": "MIO_EUR"
+        },
+        "unit": "million EUR",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt?format=JSON&geo=LU&lang=EN&na_item=GD&sector=S13&unit=MIO_EUR"
+      },
+      "target": {
+        "period": "2026-Q2",
+        "release": {
+          "expected": "2026-10-20",
+          "calendar_source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt — empirically verified release lag: the 2026-Q1 observation carried a dataset 'updated' stamp of 2026-07-21, exactly 112 calendar days after the 2026-Q1 quarter-end (2026-03-31), matching Eurostat's documented T+112-day release convention for quarterly government debt. grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "1998-Q1..2026-Q1",
+        "data_cutoff": "2026-Q1"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 22902.734375,
+          "0.2": 23557.37109375,
+          "0.3": 23983.19921875,
+          "0.4": 24390.5703125,
+          "0.5": 24738.4375,
+          "0.6": 25052.1953125,
+          "0.7": 25552.2421875,
+          "0.8": 26486.6953125,
+          "0.9": 27926.59375
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 26402.1
+        },
+        "rw_drift": {
+          "point": 26622.44732142857
+        }
+      },
+      "created_utc": "2026-09-01T17:35:21Z",
+      "sha256": "7e00a2af39e5fbeb8f332bc13afdae75cdf4f09ea82e71b00548e88eb23a189c"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-unemp--2026-08--r1",
+      "series": {
+        "slug": "lu-unemp",
+        "title": "Luxembourg unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "LU",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=LU&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-30",
+          "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "1983-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 6.923365592956543,
+          "0.2": 7.017150402069092,
+          "0.3": 7.051187515258789,
+          "0.4": 7.076803684234619,
+          "0.5": 7.114014148712158,
+          "0.6": 7.1474456787109375,
+          "0.7": 7.189540386199951,
+          "0.8": 7.2644147872924805,
+          "0.9": 7.343601226806641
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 7.1
+        },
+        "rw_drift": {
+          "point": 7.10727969348659
+        }
+      },
+      "created_utc": "2026-09-01T17:35:21Z",
+      "sha256": "4181f939e696972e127676e29f1d4f95845c44e7eeccb760329e51fb38fe4d93"
+    }
+  ],
+  "outcomes": [],
+  "corrections": [],
+  "stats": {
+    "n_open": 4,
+    "n_scored": 0,
+    "n_unevaluable": 0,
+    "coverage80": {
+      "empirical": null,
+      "nominal": 0.8
+    },
+    "mean_pinball_by_series": {}
+  }
+}
+</script>
+<script id="kernelSrc">
+/*
+ * ledger.js -- the scoring kernel for Ledger, Iterative Intelligence
+ * instrument #8: "the forecast that grades itself."
+ *
+ * Self-contained, dependency-free, plain script (no modules / no imports,
+ * matching the suite convention set by phantom.js / twdist.js). Attaches
+ * `window.Ledger` in a browser and `module.exports` in Node so the same
+ * code path runs the live page and `node ledger.test.js`.
+ *
+ * WHAT LIVES HERE (all of it EXACT arithmetic -- closed forms, not fits):
+ *
+ *  1. Pinball (quantile) loss and the aggregates built from it, per the
+ *     binding spec:
+ *       L_q(y, f_q) = (y - f_q) * q         if y >= f_q
+ *                   = (f_q - y) * (1 - q)   otherwise
+ *     pinball_mean = mean of L_q over the 9 registered deciles q in
+ *       {0.1, 0.2, ..., 0.9}. interval80_hit = (f_0.1 <= y <= f_0.9).
+ *     abs_err_median = |y - f_0.5|, compared against the registered naive
+ *     and random-walk-with-drift baseline POINT forecasts (their absolute
+ *     errors, NOT run through pinball -- a point forecast has no quantile
+ *     spread to score against).
+ *
+ *  2. Canonicalisation + SHA-256, used two ways: (a) the offline pipeline
+ *     hashes a registration's fields (every field above "sha256", sorted
+ *     keys, no whitespace) to produce the value stored in the registry
+ *     file; (b) this SAME code, inlined into the page, recomputes that
+ *     hash live, in the browser, for every registration on screen, so the
+ *     "stored" hash is never taken on faith -- it is the house doctrine's
+ *     "independent reference check recomputes every published metric by a
+ *     separate code path" applied to the registry's own integrity, not
+ *     just to the scoring math.
+ *
+ *  3. Registry-wide aggregates for the Scoreboard: verdict counts (OPEN /
+ *     SCORED / UNEVALUABLE), empirical 80% interval coverage across SCORED
+ *     verdicts vs the nominal 0.80, and per-series means of pinball_mean
+ *     and abs_err_median (model vs naive vs rw_drift). The empty-registry
+ *     case (zero outcomes) returns null aggregates rather than 0/0 -- the
+ *     page renders that as the deliberate empty state, not as a zero.
+ *
+ * Nothing here fetches anything or reads the DOM; app.js does that.
+ */
+;(function (global) {
+  'use strict';
+
+  /* ===================================================================== *
+   * 1. Pinball loss and the per-registration score.
+   * ===================================================================== */
+
+  var DECILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+
+  /* key a decile the same way the fcreg schema does: "0.1" .. "0.9" */
+  function qkey(q) { return q.toFixed(1); }
+
+  function pinballLoss(y, fq, q) {
+    if (y >= fq) return (y - fq) * q;
+    return (fq - y) * (1 - q);
+  }
+
+  /* deciles: { "0.1": x, ..., "0.9": x } -> { "0.1": loss, ... } */
+  function pinballByDecile(y, deciles) {
+    var out = {};
+    for (var i = 0; i < DECILES.length; i++) {
+      var k = qkey(DECILES[i]);
+      out[k] = pinballLoss(y, deciles[k], DECILES[i]);
+    }
+    return out;
+  }
+
+  function pinballMean(y, deciles) {
+    var byd = pinballByDecile(y, deciles);
+    var sum = 0;
+    for (var i = 0; i < DECILES.length; i++) sum += byd[qkey(DECILES[i])];
+    return sum / DECILES.length;
+  }
+
+  function interval80Hit(y, deciles) {
+    return y >= deciles['0.1'] && y <= deciles['0.9'];
+  }
+
+  function absErrMedian(y, deciles) {
+    return Math.abs(y - deciles['0.5']);
+  }
+
+  /* Score one registration against its realised outturn value. Returns the
+   * exact `metrics` object the fcreg outcomes/<id>.json schema expects.
+   * Pure function: same registration + same y -> bit-identical metrics,
+   * every time, in the pipeline or in the browser. */
+  function scoreRegistration(registration, y) {
+    var deciles = registration.forecast.deciles;
+    var pinball_by_decile = pinballByDecile(y, deciles);
+    var pinball_mean = pinballMean(y, deciles);
+    var interval80_hit = interval80Hit(y, deciles);
+    var abs_err_median = absErrMedian(y, deciles);
+    var naive_abs_err = Math.abs(y - registration.baselines.naive.point);
+    var rw_drift_abs_err = Math.abs(y - registration.baselines.rw_drift.point);
+    return {
+      pinball_mean: pinball_mean,
+      pinball_by_decile: pinball_by_decile,
+      interval80_hit: interval80_hit,
+      abs_err_median: abs_err_median,
+      naive_abs_err: naive_abs_err,
+      rw_drift_abs_err: rw_drift_abs_err
+    };
+  }
+
+  /* ===================================================================== *
+   * 2. Canonical JSON + SHA-256 (FIPS 180-4), pure JS, no Web Crypto
+   *    dependency -- so it runs identically in Node (fixture generation,
+   *    node ledger.test.js) and in every browser, including file:// and
+   *    non-secure-context embeds where crypto.subtle may be unavailable.
+   * ===================================================================== */
+
+  /* String literal, ASCII-only: JSON.stringify already escapes quotes,
+   * backslashes and control characters correctly, so this only has to
+   * additionally \uXXXX-escape anything left over that is not printable
+   * ASCII (code unit > 0x7E) -- which is exactly Python's json.dumps
+   * default ensure_ascii=True behaviour, INCLUDING how it renders a
+   * character outside the Basic Multilingual Plane: JS strings are UTF-16
+   * internally, so a non-BMP code point is already split into the same
+   * two surrogate code units Python's ensure_ascii encodes as two \u
+   * escapes -- escaping unit-by-unit reproduces that byte-for-byte with
+   * no special-casing. This is NOT a stylistic choice: the offline
+   * pipeline that fills data/registry/ledger.json hashes with Python's
+   * `json.dumps(fields, sort_keys=True, separators=(',', ':'))`, which
+   * defaults to ensure_ascii=True, so any registration whose text (a
+   * calendar_source note, a title) contains a non-ASCII character (an
+   * em dash, a curly apostrophe) would otherwise hash differently here
+   * than it did at registration time -- a real cross-language mismatch
+   * caught by exactly this: two of the first four real registrations
+   * this instrument ever produced failed verification before this fix. */
+  function jsonStringEscape(str) {
+    var s = JSON.stringify(str);
+    var out = '';
+    for (var i = 0; i < s.length; i++) {
+      var code = s.charCodeAt(i);
+      out += (code > 0x7E) ? ('\\u' + ('0000' + code.toString(16)).slice(-4)) : s[i];
+    }
+    return out;
+  }
+
+  /* Deterministic string form: object keys sorted (recursively), arrays
+   * keep their given order, no inserted whitespace, non-ASCII text
+   * \u-escaped. Matches the fcreg spec's "canonical JSON of every field
+   * above this one, sorted keys, no whitespace" AND the offline pipeline's
+   * actual Python json.dumps(sort_keys=True, separators=(',',':'))
+   * (ensure_ascii=True by default) byte-for-byte -- verified in
+   * ledger.test.js against real Python-computed oracle hashes. */
+  function canonicalize(value) {
+    if (typeof value === 'string') return jsonStringEscape(value);
+    if (value === null || typeof value !== 'object') return JSON.stringify(value);
+    if (Array.isArray(value)) {
+      var items = new Array(value.length);
+      for (var i = 0; i < value.length; i++) items[i] = canonicalize(value[i]);
+      return '[' + items.join(',') + ']';
+    }
+    var keys = Object.keys(value).sort();
+    var parts = new Array(keys.length);
+    for (var k = 0; k < keys.length; k++) {
+      parts[k] = jsonStringEscape(keys[k]) + ':' + canonicalize(value[keys[k]]);
+    }
+    return '{' + parts.join(',') + '}';
+  }
+
+  /* UTF-8 encode a JS string to an array of bytes (0..255). Handles the
+   * full BMP + surrogate pairs via codePointAt, so non-ASCII title/unit
+   * strings hash correctly. */
+  function utf8Bytes(str) {
+    var bytes = [];
+    for (var i = 0; i < str.length; i++) {
+      var c = str.codePointAt(i);
+      if (c > 0xFFFF) i++; /* consumed a surrogate pair */
+      if (c < 0x80) {
+        bytes.push(c);
+      } else if (c < 0x800) {
+        bytes.push(0xC0 | (c >> 6), 0x80 | (c & 0x3F));
+      } else if (c < 0x10000) {
+        bytes.push(0xE0 | (c >> 12), 0x80 | ((c >> 6) & 0x3F), 0x80 | (c & 0x3F));
+      } else {
+        bytes.push(0xF0 | (c >> 18), 0x80 | ((c >> 12) & 0x3F), 0x80 | ((c >> 6) & 0x3F), 0x80 | (c & 0x3F));
+      }
+    }
+    return bytes;
+  }
+
+  var K256 = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+  ];
+
+  function rotr(x, n) { return (x >>> n) | (x << (32 - n)); }
+
+  /* sha256Hex(str): the lower-case hex digest of the UTF-8 bytes of `str`.
+   * Standard FIPS 180-4 message schedule/compression, unrolled to plain
+   * 32-bit ops (Node and every browser back to ES5 has these). Verified
+   * against the NIST test vectors ("", "abc", the 448-bit vector) in
+   * ledger.test.js. */
+  function sha256Hex(str) {
+    var bytes = utf8Bytes(str);
+    var bitLen = bytes.length * 8;
+    bytes.push(0x80);
+    while (bytes.length % 64 !== 56) bytes.push(0);
+    var hi = Math.floor(bitLen / 0x100000000);
+    var lo = bitLen >>> 0;
+    bytes.push((hi >>> 24) & 0xff, (hi >>> 16) & 0xff, (hi >>> 8) & 0xff, hi & 0xff,
+               (lo >>> 24) & 0xff, (lo >>> 16) & 0xff, (lo >>> 8) & 0xff, lo & 0xff);
+
+    var H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    var W = new Uint32Array(64);
+
+    for (var offset = 0; offset < bytes.length; offset += 64) {
+      var t;
+      for (t = 0; t < 16; t++) {
+        var j = offset + t * 4;
+        W[t] = ((bytes[j] << 24) | (bytes[j + 1] << 16) | (bytes[j + 2] << 8) | bytes[j + 3]) >>> 0;
+      }
+      for (t = 16; t < 64; t++) {
+        var s0 = rotr(W[t - 15], 7) ^ rotr(W[t - 15], 18) ^ (W[t - 15] >>> 3);
+        var s1 = rotr(W[t - 2], 17) ^ rotr(W[t - 2], 19) ^ (W[t - 2] >>> 10);
+        W[t] = (W[t - 16] + s0 + W[t - 7] + s1) >>> 0;
+      }
+      var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+      for (t = 0; t < 64; t++) {
+        var S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+        var ch = (e & f) ^ (~e & g);
+        var temp1 = (h + S1 + ch + K256[t] + W[t]) >>> 0;
+        var S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+        var maj = (a & b) ^ (a & c) ^ (b & c);
+        var temp2 = (S0 + maj) >>> 0;
+        h = g; g = f; f = e; e = (d + temp1) >>> 0;
+        d = c; c = b; b = a; a = (temp1 + temp2) >>> 0;
+      }
+      H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0; H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0;
+      H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0; H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+    }
+    var hex = '';
+    for (var i = 0; i < 8; i++) hex += ('00000000' + H[i].toString(16)).slice(-8);
+    return hex;
+  }
+
+  /* Recompute a registration's sha256 from its own fields (everything
+   * except the "sha256" key itself) and report whether it matches the
+   * stored value. Returns { ok, expected, computed }. `ok` is false (not
+   * thrown) on a missing/malformed sha256 field, so a corrupt record shows
+   * up on the Ledger table as a failed check rather than a page crash. */
+  function verifyRegistrationHash(registration) {
+    var copy = {}, k;
+    for (k in registration) {
+      if (Object.prototype.hasOwnProperty.call(registration, k) && k !== 'sha256') copy[k] = registration[k];
+    }
+    var computed = sha256Hex(canonicalize(copy));
+    var expected = registration.sha256;
+    return { ok: typeof expected === 'string' && expected.toLowerCase() === computed, expected: expected, computed: computed };
+  }
+
+  /* ===================================================================== *
+   * 3. Registry-wide aggregates for the Scoreboard.
+   * ===================================================================== */
+
+  function mean(arr) {
+    if (!arr.length) return null;
+    var s = 0;
+    for (var i = 0; i < arr.length; i++) s += arr[i];
+    return s / arr.length;
+  }
+
+  function median(arr) {
+    if (!arr.length) return null;
+    var a = arr.slice().sort(function (x, y) { return x - y; });
+    var n = a.length, mid = Math.floor(n / 2);
+    return (n % 2) ? a[mid] : (a[mid - 1] + a[mid]) / 2;
+  }
+
+  /* aggregate(registrations, outcomes):
+   *   registrations: array of fcreg registration objects
+   *   outcomes:      array of fcreg outcome objects ({ id, verdict, reason,
+   *                  outturn, metrics, scored_utc }), one per SCORED or
+   *                  UNEVALUABLE registration (an id with no outcome entry
+   *                  is OPEN by definition -- there is no separate "OPEN"
+   *                  file, per the append-only registry design).
+   *
+   * Returns a plain object; every SCORED-only aggregate is null (not 0 or
+   * NaN) when there are zero SCORED verdicts, so the page can render the
+   * deliberate empty state instead of a misleading zero. */
+  function aggregate(registrations, outcomes) {
+    registrations = registrations || [];
+    outcomes = outcomes || [];
+
+    var outcomeById = {};
+    for (var i = 0; i < outcomes.length; i++) outcomeById[outcomes[i].id] = outcomes[i];
+
+    var counts = { OPEN: 0, SCORED: 0, UNEVALUABLE: 0 };
+    var scored = [];
+    for (i = 0; i < registrations.length; i++) {
+      var reg = registrations[i];
+      var oc = outcomeById[reg.id];
+      if (!oc) { counts.OPEN++; continue; }
+      if (oc.verdict === 'SCORED') { counts.SCORED++; scored.push({ reg: reg, oc: oc }); }
+      else if (oc.verdict === 'UNEVALUABLE') { counts.UNEVALUABLE++; }
+      else { counts.OPEN++; } /* defensive: unrecognised verdict treated as still-open */
+    }
+
+    var hits = 0;
+    for (i = 0; i < scored.length; i++) if (scored[i].oc.metrics.interval80_hit) hits++;
+    var empiricalCoverage80 = scored.length ? hits / scored.length : null;
+
+    var bySeries = {};
+    for (i = 0; i < scored.length; i++) {
+      var slug = scored[i].reg.series.slug;
+      var m = scored[i].oc.metrics;
+      if (!bySeries[slug]) bySeries[slug] = { n: 0, pinball: [], absErr: [], naiveErr: [], rwErr: [] };
+      var s = bySeries[slug];
+      s.n++;
+      s.pinball.push(m.pinball_mean);
+      s.absErr.push(m.abs_err_median);
+      s.naiveErr.push(m.naive_abs_err);
+      s.rwErr.push(m.rw_drift_abs_err);
+    }
+    var seriesSummary = {};
+    for (var slug2 in bySeries) {
+      var b = bySeries[slug2];
+      seriesSummary[slug2] = {
+        n: b.n,
+        pinball_mean: mean(b.pinball),
+        abs_err_median_mean: mean(b.absErr),
+        naive_abs_err_mean: mean(b.naiveErr),
+        rw_drift_abs_err_mean: mean(b.rwErr)
+      };
+    }
+
+    return {
+      total: registrations.length,
+      counts: counts,
+      scoredCount: scored.length,
+      empiricalCoverage80: empiricalCoverage80,
+      nominalCoverage80: 0.80,
+      bySeries: seriesSummary
+    };
+  }
+
+  /* Next expected grading date per still-OPEN registration, soonest first
+   * -- used by the empty-state scoreboard so "0 verdicts" still names
+   * something concrete on the calendar rather than reading as inert. */
+  function upcomingGradings(registrations, outcomes) {
+    registrations = registrations || []; outcomes = outcomes || [];
+    var scoredIds = {};
+    for (var i = 0; i < outcomes.length; i++) scoredIds[outcomes[i].id] = true;
+    var open = [];
+    for (i = 0; i < registrations.length; i++) {
+      var r = registrations[i];
+      if (scoredIds[r.id]) continue;
+      open.push({ id: r.id, series: r.series.slug, title: r.series.title, target: r.target.period, expected: r.target.release.expected });
+    }
+    open.sort(function (a, b) { return a.expected < b.expected ? -1 : a.expected > b.expected ? 1 : 0; });
+    return open;
+  }
+
+  /* ---------- export ---------- */
+  var api = {
+    DECILES: DECILES,
+    pinballLoss: pinballLoss,
+    pinballByDecile: pinballByDecile,
+    pinballMean: pinballMean,
+    interval80Hit: interval80Hit,
+    absErrMedian: absErrMedian,
+    scoreRegistration: scoreRegistration,
+    canonicalize: canonicalize,
+    sha256Hex: sha256Hex,
+    verifyRegistrationHash: verifyRegistrationHash,
+    mean: mean,
+    median: median,
+    aggregate: aggregate,
+    upcomingGradings: upcomingGradings
+  };
+  if (global) global.Ledger = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+
+})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this)));
+
+</script>
+<script>
+/* =====================================================================
+ * suite/chassis/chassis.js
+ * Framework-free helpers shared by the STEM instruments suite.
+ *
+ * Every export below was lifted from at least TWO of the three shipped
+ * pages (repulsion / arctic / fever); the "from:" note on each says
+ * where.  Single-page code (Fever's spinCanvas, Arctic's tileCanvas /
+ * relief / marching-squares, Repulsion's drawStrip / drawHist) is NOT
+ * here on purpose — it is domain rendering, not chassis.
+ *
+ * The seedable PRNG makeRng is NOT duplicated here: it lives in the
+ * kernel (repulsion/ensemble.js exports Ensemble.makeRng, aliased .rng)
+ * and pages import it from whichever kernel they inline.  See README.
+ *
+ * Loads the same way the kernels do: attaches to window/self when
+ * concatenated into a page, and to module.exports so the node tests can
+ * require it.  Nothing here touches document / matchMedia / Worker at
+ * load time — only when a helper is called — so require() is safe.
+ * ===================================================================== */
+(function(root){
+'use strict';
+
+/* ---------- tiny DOM + format (all three pages) ---------- */
+var $ = function(id){ return document.getElementById(id); };
+/* from: all three.  '—' for null/undefined/non-finite, else toFixed(d). */
+function fmt(v, d){ return (v === null || v === undefined || !isFinite(v)) ? '—' : v.toFixed(d); }
+
+var FONT_M = '11px "IBM Plex Mono", ui-monospace, monospace';   /* from: all three */
+var FONT_S = '11px "IBM Plex Mono", ui-monospace, Menlo, monospace';
+
+/* from: all three.  One-shot feature probe; pages toggle a #noCanvas note. */
+function canvasSupported(){
+  try{ return !!document.createElement('canvas').getContext('2d'); }catch(e){ return false; }
+}
+function prefersReducedMotion(){
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/* =====================================================================
+ * CANVAS SIZING — fit() with the data-h fix.
+ * from: all three (the data-h caching originates in Repulsion; Arctic &
+ * Fever added fitBox / fitSquare on top).
+ *
+ * The fix: a CSS-stretched canvas has NO intrinsic height once width is
+ * driven to 100%, so the FIRST fit caches the author's height="NN"
+ * attribute into dataset.h and pins style.height, and every later fit
+ * reads back that cached number instead of the now-meaningless
+ * getAttribute('height').  Without it the canvas collapses on the second
+ * layout pass.  DPR is clamped to 2 so retina phones do not allocate 3x
+ * or 4x the pixels for no visible gain.
+ * ===================================================================== */
+function fit(cv){
+  var dpr = Math.min((typeof devicePixelRatio !== 'undefined' ? devicePixelRatio : 1) || 1, 2);
+  if(!cv.dataset.h){ cv.dataset.h = cv.getAttribute('height'); cv.style.height = cv.dataset.h + 'px'; }
+  var h = +cv.dataset.h, w = cv.clientWidth;
+  if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  }
+  var g = cv.getContext('2d'); if(!g) return null;
+  g.setTransform(dpr,0,0,dpr,0,0);
+  return {g:g, w:w, h:h};
+}
+/* from: arctic + fever (SHAPE only — the two pages floor at different
+ * heights).  Re-pin data-h to a computed height (used to keep a board
+ * square as the column resizes), then fit().
+ *
+ * `floor` is an ABSOLUTE minimum height, INDEPENDENT of any fitSquare
+ * clamp-min: Fever's fitBox hardcodes 60, Arctic's hardcodes 120.  The
+ * default here is Fever's 60; a page whose panels must not fall below
+ * 120px (Arctic's filmstrip thumbnails) passes floor:120 — see
+ * fitSquare.  Keeping the two numbers as one shared default is
+ * impossible (they differ), so the floor is a parameter, not a constant.
+ * Earlier drafts threaded the fitSquare `min` in as this floor, which is
+ * a no-op — fitBox already gets h>=min — and so silently dropped Arctic's
+ * 120 floor whenever it sat ABOVE the clamp-min (min 110 thumbnails). */
+function fitBox(cv, h, floor){
+  h = Math.max(floor === undefined ? 60 : floor, Math.round(h));
+  if(cv.dataset.h !== String(h)){ cv.dataset.h = String(h); cv.style.height = h + 'px'; }
+  return fit(cv);
+}
+/* from: arctic + fever (SHAPE only).  Square panel: height tracks width,
+ * clamped to [min,max]; `floor` is the absolute minimum handed to fitBox
+ * (default 60, Fever's).  Arctic call sites pass floor:120 to preserve
+ * their unconditional 120px floor, e.g. fitSquare(cv, 110, 240, 120). */
+function fitSquare(cv, min, max, floor){
+  var w = cv.clientWidth || (min || 200);
+  return fitBox(cv, Math.max(min || 80, Math.min(max || 520, w)), floor === undefined ? 60 : floor);
+}
+
+/* =====================================================================
+ * THEME — colour reading + the live theme system.
+ * from: all three.
+ * ===================================================================== */
+/* from: fever + arctic.  '#abc' -> [170,187,204]; '#aabbcc' -> [.. ..]. */
+function hexRGB(h){
+  h = String(h).replace('#','');
+  if(h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+/* from: all three (Fever/Arctic shape).  Reads a list of --custom-property
+ * names off :root into a flat object, keyed with '-' -> '_', plus a .rgb
+ * sub-object holding the hex ones parsed to [r,g,b].  Returns
+ * { C, themeKey } where themeKey is a cheap change-detector for caches
+ * (pages pass the tokens that flip hardest between light and dark). */
+function readColors(names, themeKeyVars){
+  var s = getComputedStyle(document.documentElement), C = {}, i;
+  for(i=0;i<names.length;i++){
+    C[names[i].replace(/-/g,'_')] = s.getPropertyValue('--'+names[i]).trim();
+  }
+  C.rgb = {};
+  for(var k in C){
+    if(typeof C[k] === 'string' && C[k].charAt(0) === '#') C.rgb[k] = hexRGB(C[k]);
+  }
+  var keyVars = themeKeyVars || ['card','ink','line'];
+  var key = '';
+  for(i=0;i<keyVars.length;i++) key += (i?'|':'') + (C[keyVars[i].replace(/-/g,'_')] || '');
+  return { C:C, themeKey:key };
+}
+/* from: all three.  Fires onChange whenever the effective theme changes,
+ * by BOTH routes: an OS-level prefers-color-scheme flip AND a
+ * data-theme attribute toggle on <html>.  onChange is where a page
+ * re-reads its colours and redraws.  Returns a disposer.  Guard the
+ * redraw in the page (all three wrap it in try/catch). */
+function watchTheme(onChange){
+  var mq = matchMedia('(prefers-color-scheme: dark)');
+  var mqHandler = function(){ onChange(); };
+  if(mq.addEventListener) mq.addEventListener('change', mqHandler);
+  else if(mq.addListener) mq.addListener(mqHandler);          /* older Safari */
+  var mo = new MutationObserver(function(){ onChange(); });
+  mo.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+  return function dispose(){
+    if(mq.removeEventListener) mq.removeEventListener('change', mqHandler);
+    else if(mq.removeListener) mq.removeListener(mqHandler);
+    mo.disconnect();
+  };
+}
+
+/* =====================================================================
+ * WORKERS — makeWorker(): one Blob-URL Worker over inlined kernel source.
+ * from: arctic + fever (Repulsion has no worker).
+ *
+ * Both pages build a Worker from a Blob that is  "var window=self;\n" +
+ * the inlined kernel <script> text + the page's WORKER_BODY.  The
+ * "var window=self;" prelude lets a kernel written to export onto
+ * `window` run unchanged inside a Worker (where the global is `self`).
+ * A page usually builds two Workers off ONE blob URL (a UI worker and a
+ * background worker) — pass reuseUrl to share it.
+ * ===================================================================== */
+function _scriptText(scriptElOrId, mustContain){
+  var el = (typeof scriptElOrId === 'string') ? document.getElementById(scriptElOrId) : scriptElOrId;
+  if(!el && mustContain){
+    /* fallback scan so the lookup never depends on document order */
+    var scripts = document.scripts;
+    for(var i=0;i<scripts.length;i++){
+      if(scripts[i].textContent.indexOf(mustContain) >= 0){ el = scripts[i]; break; }
+    }
+  }
+  return el ? el.textContent : '';
+}
+/* Returns { worker, url } or throws.  opts:
+ *   body       (string)  the WORKER_BODY appended after the kernel   [required]
+ *   mustContain(string)  a token that must appear in the kernel source, both
+ *                        as the fallback-scan key and as a sanity check
+ *   prelude    (string)  defaults to 'var window = self;\n'
+ *   reuseUrl   (string)  reuse a blob URL returned by an earlier call
+ *   onMessage, onError   handlers wired onto the worker
+ * Caller owns termination; revoke the URL when the last worker is gone. */
+function makeWorker(scriptElOrId, opts){
+  opts = opts || {};
+  var url = opts.reuseUrl;
+  if(!url){
+    var src = _scriptText(scriptElOrId, opts.mustContain);
+    if(opts.mustContain && (!src || src.indexOf(opts.mustContain) < 0)){
+      throw new Error('kernel source not found for the Worker');
+    }
+    var prelude = opts.prelude === undefined ? 'var window = self;\n' : opts.prelude;
+    var blob = new Blob([prelude, src, '\n', opts.body || ''], {type:'text/javascript'});
+    url = URL.createObjectURL(blob);
+  }
+  var w = new Worker(url);
+  if(opts.onMessage) w.onmessage = opts.onMessage;
+  if(opts.onError) w.onerror = opts.onError;
+  return { worker:w, url:url };
+}
+
+/* =====================================================================
+ * BATCH / TOKEN — drop stale worker responses after a resample race.
+ * from: arctic (S4.token, nToken) + fever (S1.batch, S4.token/snapToken).
+ *
+ * Every request stamps the current id; when a response comes back the
+ * page keeps it only if its id still matches.  makeBatch() packages that
+ * so a page does not hand-roll `if(d.token !== S4.token) return;`.
+ * ===================================================================== */
+function makeBatch(){
+  var current = 0;
+  return {
+    next:   function(){ return ++current; },       /* stamp a new request */
+    get current(){ return current; },
+    accepts: function(id){ return id === current; }, /* true iff not stale */
+    is: function(id){ return id === current; }
+  };
+}
+
+/* =====================================================================
+ * BACKGROUND SAMPLER SCHEDULER — gated on document.hidden.
+ * SHAPE from: arctic scheduleTick + fever scheduleTick / scheduleHero.
+ * DEFAULT CONSTANTS from: fever only (see below).
+ *
+ * A self-re-arming setTimeout loop that posts a "tick" to a background
+ * worker, NEVER while the tab is hidden, with a fast warm-up phase (fill
+ * empty charts while the reader is scrolling in) that decays to a slow
+ * steady state (accumulators are capped, so a left-open tab costs a
+ * fraction of a core).  Honours reduced motion.  Re-arms itself on
+ * visibilitychange.  The page's onTick does the postMessage.
+ *
+ * ONLY the algorithmic shape is shared by both pages.  The default
+ * warmTicks/fast/slow/reducedFast/reducedSlow below are Fever's exact
+ * numbers (120 / 20 / 450 / 150 / 600); Arctic's scheduleTick uses a
+ * different cadence — warmTicks 4, fast 60, slow 420, and a single FLAT
+ * reduced-motion gap of 1400ms with no warm/steady split.  A page on
+ * Arctic's tuning MUST pass those explicitly:
+ *   makeSampler({ warmTicks:4, fast:60, slow:420,
+ *                 reducedFast:1400, reducedSlow:1400, ... })
+ * (the flat reduced gap is expressed by setting both reduced* to 1400).
+ * Do NOT assume the defaults are validated against both pages.
+ * ===================================================================== */
+function makeSampler(opts){
+  opts = opts || {};
+  var onTick   = opts.onTick || function(){};
+  var warmTicks= opts.warmTicks === undefined ? 120 : opts.warmTicks;
+  var fast     = opts.fast === undefined ? 20  : opts.fast;   /* ms, warm-up  */
+  var slow     = opts.slow === undefined ? 450 : opts.slow;   /* ms, steady   */
+  var reducedFast = opts.reducedFast === undefined ? 150 : opts.reducedFast;
+  var reducedSlow = opts.reducedSlow === undefined ? 600 : opts.reducedSlow;
+  var canRun   = opts.canRun || function(){ return true; };   /* e.g. workerOK && running */
+  var reduced  = opts.reduced === undefined ? prefersReducedMotion() : opts.reduced;
+  var n = 0, timer = null, stopped = false;
+
+  function gap(){
+    if(n < warmTicks) return reduced ? reducedFast : fast;
+    return reduced ? reducedSlow : slow;
+  }
+  function schedule(){
+    clearTimeout(timer);
+    if(stopped || document.hidden) return;             /* hidden: visibilitychange re-arms */
+    if(!canRun()){ timer = setTimeout(schedule, 200); return; }  /* re-poll until canRun recovers (was: die permanently — phantom review) */
+    timer = setTimeout(function(){ n++; onTick(n); schedule(); }, gap());
+  }
+  var visHandler = function(){ if(!document.hidden) schedule(); };
+  document.addEventListener('visibilitychange', visHandler);
+
+  return {
+    /* start() resets the warm-tick counter so a reused sampler re-warms
+     * instead of being stuck in the slow phase (phantom review). */
+    start: function(){ n = 0; stopped = false; schedule(); },
+    /* call from the worker's onmessage to pace the NEXT tick off completion
+     * (both pages re-schedule from inside the response handler) */
+    kick: schedule,
+    stop: function(){ stopped = true; clearTimeout(timer); },
+    get ticks(){ return n; },
+    dispose: function(){ this.stop(); document.removeEventListener('visibilitychange', visHandler); }
+  };
+}
+
+/* =====================================================================
+ * makeRaf — a requestAnimationFrame loop for MAIN-THREAD animated pages
+ * (sunflower's growing seed head, flash's fireflies).  makeSampler above
+ * is worker/timeout-shaped and pages had to coerce it (warmTicks ~1e9) to
+ * drive a per-frame animation; this is the right tool for that job.
+ *  - onFrame(dtMs) is called once per frame while the tab is visible and
+ *    opts.canRun() is true; dtMs is the clamped time since the last frame.
+ *  - Hidden-gated (rAF already pauses when hidden; we also reset the clock
+ *    so there is no dt spike on resume) and reduced-motion aware: under
+ *    reduced motion start() is a no-op unless opts.runWhenReduced, so the
+ *    page should draw its initial state ONCE and then call start().
+ * ===================================================================== */
+function makeRaf(onFrame, opts){
+  opts = opts || {};
+  var reduced = opts.reduced === undefined ? prefersReducedMotion() : opts.reduced;
+  var canRun  = opts.canRun || function(){ return true; };
+  var maxDt   = opts.maxDt === undefined ? 100 : opts.maxDt;   /* clamp long gaps */
+  var raf = 0, last = 0, stopped = true;
+  function loop(ts){
+    if(stopped) return;
+    if(document.hidden || !canRun()){ last = 0; raf = requestAnimationFrame(loop); return; }
+    var dt = last ? Math.min(ts - last, maxDt) : 16; last = ts;
+    onFrame(dt);
+    raf = requestAnimationFrame(loop);
+  }
+  return {
+    start: function(){ if(reduced && !opts.runWhenReduced) return; if(!stopped) return; stopped = false; last = 0; raf = requestAnimationFrame(loop); },
+    stop:  function(){ stopped = true; if(raf) cancelAnimationFrame(raf); raf = 0; },
+    get running(){ return !stopped; },
+    dispose: function(){ this.stop(); }
+  };
+}
+
+/* =====================================================================
+ * DEBOUNCE — coalesce slider input into one worker request.
+ * from: arctic requestDial (140ms) + fever requestDial (160ms).
+ * ===================================================================== */
+function debounce(fn, ms){
+  var t = null;
+  var wrapped = function(){
+    var args = arguments, self = this;
+    clearTimeout(t);
+    t = setTimeout(function(){ fn.apply(self, args); }, ms);
+  };
+  wrapped.cancel = function(){ clearTimeout(t); };
+  return wrapped;
+}
+
+/* =====================================================================
+ * RING BUFFER — a bounded accumulator that keeps the last N.
+ * from: arctic (S2.radii.slice(-400); worker rows.slice(-2000)) +
+ *       fever (tauSeen capped at 60 by deleting the oldest key).
+ * A plain array grows without bound in a left-open tab; this drops from
+ * the front once full.
+ * ===================================================================== */
+function ringBuffer(cap){
+  var a = [];
+  return {
+    push: function(v){ a.push(v); if(a.length > cap) a.splice(0, a.length - cap); return a; },
+    get length(){ return a.length; },
+    get array(){ return a; },              /* live reference, already bounded */
+    toArray: function(){ return a.slice(); },
+    clear: function(){ a.length = 0; },
+    last: function(){ return a.length ? a[a.length-1] : undefined; }
+  };
+}
+
+/* =====================================================================
+ * CHART / AXIS PRIMITIVES.
+ *
+ * TWO tiers, honestly labelled:
+ *   SHARED (in >=2 pages today): frame(), dot(), hline() — Arctic + Fever
+ *     both define and call these (identical frame(); Repulsion has its own
+ *     simpler axis in drawHist, which stays page-local).
+ *   FORWARD-LOOKING (Fever-only today): ring(), vline(), curve(),
+ *     emptyMsg().  These live only in Fever right now — Arctic draws its
+ *     reference marks and theory curves by hand (inline setLineDash).
+ *     They are promoted here deliberately as the chart vocabulary that
+ *     pairs with frame()/dot()/hline() for the NEXT pages, NOT because
+ *     they already appear in two pages.  If a future page never needs
+ *     them they can be pushed back down into Fever as page-local code.
+ * ===================================================================== */
+/* frame(): grid lines, y/x tick labels, optional axis titles, and the
+ * left+bottom axis rules.  Returns { X, Y, L, R, T, B, pw, ph } — X/Y
+ * map data coords to pixels.  Needs a colour object C with .line .ink2
+ * .ink3 (pass the object your readColors() built). */
+function frame(g, w, h, o, C){
+  var L = o.L===undefined?46:o.L, Rm = o.R===undefined?14:o.R,
+      Tp = o.T===undefined?14:o.T, B = o.B===undefined?34:o.B;
+  var pw = w-L-Rm, ph = h-Tp-B;
+  var X = function(v){ return L + (v-o.x0)/(o.x1-o.x0)*pw; };
+  var Y = function(v){ return Tp + ph - (v-o.y0)/(o.y1-o.y0)*ph; };
+  var t, i;
+  g.strokeStyle = C.line; g.lineWidth = 1; g.beginPath();
+  for(i=0;i<o.yticks.length;i++){ var y = Y(o.yticks[i])+0.5; g.moveTo(L, y); g.lineTo(w-Rm, y); }
+  g.stroke();
+  g.fillStyle = C.ink2; g.font = FONT_M; g.textAlign='right'; g.textBaseline='middle';
+  for(i=0;i<o.yticks.length;i++){ t = o.yticks[i]; g.fillText(o.yfmt? o.yfmt(t) : t.toFixed(2), L-6, Y(t)); }
+  g.textAlign='center'; g.textBaseline='top';
+  for(i=0;i<o.xticks.length;i++){ t = o.xticks[i]; var v = (t && t.v!==undefined)?t.v:t; g.fillText(o.xfmt? o.xfmt(v) : String(v), X(v), h-B+7); }
+  if(o.xlabel){ g.fillStyle = C.ink2; g.font = FONT_S; g.fillText(o.xlabel, L+pw/2, h-B+21); }
+  /* Rotated y-axis title.  It sits in the left margin, centered on the plot
+   * midpoint — the SAME height as the middle y-tick label, so a fixed x
+   * collides with that tick (review finding: garbled "R(phi)" over a tick).
+   * Place it LEFT of the tick-label column by measuring the widest tick
+   * label (tick labels use FONT_M).  o.ylabelX overrides the auto x. */
+  if(o.ylabel){
+    g.font = FONT_M; var maxTW = 0;
+    for(i=0;i<o.yticks.length;i++){ var lab = o.yfmt? o.yfmt(o.yticks[i]) : o.yticks[i].toFixed(2); var tw = g.measureText(''+lab).width; if(tw>maxTW) maxTW = tw; }
+    var lx = o.ylabelX!==undefined ? o.ylabelX : Math.max(8, (L-6) - maxTW - 7);
+    g.fillStyle = C.ink2; g.font = FONT_S;
+    g.save(); g.translate(lx, Tp+ph/2); g.rotate(-Math.PI/2); g.textAlign='center'; g.textBaseline='middle'; g.fillText(o.ylabel, 0, 0); g.restore();
+  }
+  g.strokeStyle = C.ink3; g.beginPath();
+  g.moveTo(L+0.5, Tp); g.lineTo(L+0.5, Tp+ph+0.5); g.lineTo(w-Rm, Tp+ph+0.5); g.stroke();
+  return {X:X, Y:Y, L:L, R:Rm, T:Tp, B:B, pw:pw, ph:ph};
+}
+function dot(g, x, y, r, colour, alpha){
+  g.fillStyle = colour; g.globalAlpha = alpha===undefined?1:alpha;
+  g.beginPath(); g.arc(x, y, r, 0, 2*Math.PI); g.fill(); g.globalAlpha = 1;
+}
+function ring(g, x, y, r, colour, alpha){
+  g.strokeStyle = colour; g.lineWidth = 1.6; g.globalAlpha = alpha===undefined?1:alpha;
+  g.beginPath(); g.arc(x, y, r, 0, 2*Math.PI); g.stroke(); g.globalAlpha = 1;
+}
+function hline(g, f, y, colour, dash, width){
+  g.strokeStyle = colour; g.lineWidth = width||1.5; if(dash) g.setLineDash(dash);
+  g.beginPath(); g.moveTo(f.L, f.Y(y)); g.lineTo(f.L+f.pw, f.Y(y)); g.stroke(); g.setLineDash([]);
+}
+/* Vertical line at data-x.  Full plot height by default.  Optional `ext`
+ * (review finding from sunflower: q_k markers needed baseline->y=2 and the
+ * ladder ticks needed a dot cap):
+ *   ext.y0 / ext.y1  data-space y-values for the bottom/top of the segment
+ *   ext.cap          radius of a filled dot drawn at the top of the segment
+ * Back-compatible: callers that omit `ext` get the original full-height line. */
+function vline(g, f, x, colour, dash, width, ext){
+  var yTop = f.T, yBot = f.T + f.ph;
+  if(ext){
+    if(ext.y0 !== undefined) yBot = f.Y(ext.y0);
+    if(ext.y1 !== undefined) yTop = f.Y(ext.y1);
+  }
+  g.strokeStyle = colour; g.lineWidth = width||1.5; if(dash) g.setLineDash(dash);
+  g.beginPath(); g.moveTo(f.X(x), yTop); g.lineTo(f.X(x), yBot); g.stroke(); g.setLineDash([]);
+  if(ext && ext.cap){ g.fillStyle = colour; g.beginPath(); g.arc(f.X(x), yTop, ext.cap, 0, 6.2831853); g.fill(); }
+}
+function curve(g, f, x0, x1, fn, colour, dash, width){
+  g.strokeStyle = colour; g.lineWidth = width||1.8; if(dash) g.setLineDash(dash);
+  g.beginPath();
+  var started = false;
+  for(var i=0;i<=220;i++){
+    var x = x0 + (x1-x0)*i/220, y = fn(x);
+    if(y === null || !isFinite(y)){ started = false; continue; }
+    var px = f.X(x), py = f.Y(y);
+    if(!started){ g.moveTo(px,py); started = true; } else g.lineTo(px,py);
+  }
+  g.stroke(); g.setLineDash([]);
+}
+function emptyMsg(g, f, txt, C){
+  g.fillStyle = C.ink2; g.font = FONT_S; g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(txt, f.L+f.pw/2, f.T+f.ph/2);
+}
+/* from: fever blit() + arctic blitTiling() — the "draw an offscreen
+ * ImageData scaled up with smoothing OFF" pattern both use for pixel art. */
+function blitSharp(g, off, x, y, w, h){
+  g.imageSmoothingEnabled = false;
+  g.drawImage(off, x, y, w, h);
+  g.imageSmoothingEnabled = true;
+}
+/* Progressive left-to-right reveal of an offscreen buffer, drawn sharp
+ * (smoothing off) and scaled to fill destW x destH.  reveal in [0,1] shows
+ * the left fraction; the offscreen's own left fraction is the source, so the
+ * image grows in from the left at true aspect.  from: branch (streaming ray
+ * field + dial previews); the reveal partner to blitSharp for pages that
+ * build an image up over time (a space-time diagram, a growing field). */
+function blitCrop(g, off, destW, destH, reveal){
+  g.clearRect(0, 0, destW, destH);
+  var f = reveal === undefined ? 1 : Math.max(0, Math.min(1, reveal));
+  var srcW = Math.max(1, Math.round(off.width * f));
+  var dstW = Math.max(1, Math.round(destW * f));
+  g.imageSmoothingEnabled = false;
+  g.drawImage(off, 0, 0, srcW, off.height, 0, 0, dstW, destH);
+  g.imageSmoothingEnabled = true;
+}
+
+/* =====================================================================
+ * ACCESSIBILITY.
+ * from: aria-valuetext on sliders — arctic (labelP/labelN) + fever
+ *       (labelDial/labelGuess); role=img + aria-label on canvas — all
+ *       three; aria-live announcer — all three (scoreAnnounce etc.).
+ * ===================================================================== */
+/* Give a range input a spoken value: the raw number is useless read
+ * aloud, so pair it with the nearest landmark's name. */
+function setSliderText(slider, text){ slider.setAttribute('aria-valuetext', text); }
+/* Update the sentence a screen reader reads for a canvas.  Every live
+ * canvas in the suite is role="img" with an aria-label kept in sync with
+ * what it currently shows. */
+function labelCanvas(cv, text){ cv.setAttribute('aria-label', text); }
+/* A polite announcer over an aria-live region.  IMPORTANT (review
+ * finding): announce ONCE per settled state, not on every worker frame —
+ * a verbose live region that fires each tick floods the screen reader.
+ * Pass the SETTLED summary (e.g. end-of-round score), not intermediate
+ * numbers.  Returns a function; calling it with the same text is a no-op
+ * so re-renders do not re-announce. */
+function makeAnnouncer(el){
+  var last = null;
+  return function(msg){
+    if(msg === last) return;
+    last = msg;
+    el.textContent = msg;
+  };
+}
+
+/* ---------- export ---------- */
+var api = {
+  $:$, fmt:fmt, FONT_M:FONT_M, FONT_S:FONT_S,
+  canvasSupported:canvasSupported, prefersReducedMotion:prefersReducedMotion,
+  fit:fit, fitBox:fitBox, fitSquare:fitSquare,
+  hexRGB:hexRGB, readColors:readColors, watchTheme:watchTheme,
+  makeWorker:makeWorker, makeBatch:makeBatch, makeSampler:makeSampler, makeRaf:makeRaf,
+  debounce:debounce, ringBuffer:ringBuffer,
+  frame:frame, dot:dot, ring:ring, hline:hline, vline:vline, curve:curve,
+  emptyMsg:emptyMsg, blitSharp:blitSharp, blitCrop:blitCrop,
+  setSliderText:setSliderText, labelCanvas:labelCanvas, makeAnnouncer:makeAnnouncer
+};
+if(root) root.Chassis = api;
+if(typeof module !== 'undefined' && module.exports) module.exports = api;
+
+})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this)));
+
+</script>
+<script>
+/* =====================================================================
+ * Ledger — page controller. Reads window.Ledger (the scoring kernel,
+ * ledger.js), window.Chassis, and the registry JSON embedded by build.js
+ * in <script id="registryData" type="application/json">. Nothing here
+ * fetches anything: the registry is baked into the page at build time,
+ * and every "live" number is computed from that embedded snapshot, in
+ * this browser, right now — there is no server behind this page at all.
+ *
+ * Sections wired here, matching body.html:
+ *   I   regCards          — one decile-fan card per registration
+ *   II  scoreboard        — Ledger.aggregate() + upcomingGradings()
+ *   III ledgerRows / correctionsList — the append-only index + corrections
+ *   IV  selfTestBtn/-Out  — runs closed-form + real-registry checks live
+ * ===================================================================== */
+(function () {
+'use strict';
+
+var Lg = window.Ledger, Ch = window.Chassis;
+var $ = Ch.$;
+var SVGNS = 'http://www.w3.org/2000/svg';
+
+/* ---------------------------------------------------------------------
+ * Registry loading: parsed once from the <script type="application/json">
+ * tag build.js embeds. { registrations:[...], outcomes:[...], corrections:[...] }
+ * ------------------------------------------------------------------- */
+function loadRegistry() {
+  var el = document.getElementById('registryData');
+  if (!el) return { registrations: [], outcomes: [], corrections: [] };
+  try {
+    var data = JSON.parse(el.textContent);
+    return {
+      registrations: data.registrations || [],
+      outcomes: data.outcomes || [],
+      corrections: data.corrections || []
+    };
+  } catch (e) {
+    console.error('registry parse failed', e);
+    return { registrations: [], outcomes: [], corrections: [] };
+  }
+}
+var REG = loadRegistry();
+var outcomeById = {};
+REG.outcomes.forEach(function (o) { outcomeById[o.id] = o; });
+
+/* ---------------------------------------------------------------------
+ * Small helpers.
+ * ------------------------------------------------------------------- */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function fmtVal(v) {
+  if (v == null || !isFinite(v)) return '—';
+  var av = Math.abs(v);
+  if (av >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  var r = Math.round(v * 100) / 100;
+  return String(r);
+}
+function fmtPct(v, d) { return (v == null || !isFinite(v)) ? '—' : (100 * v).toFixed(d == null ? 1 : d) + '%'; }
+function dimsText(dims) {
+  if (!dims) return '';
+  return Object.keys(dims).map(function (k) { return k + '=' + dims[k]; }).join(', ');
+}
+function verdictOf(regId) {
+  var oc = outcomeById[regId];
+  return oc ? oc.verdict : 'OPEN';
+}
+function chipClassFor(v) { return v === 'SCORED' ? 'scored' : (v === 'UNEVALUABLE' ? 'unevaluable' : 'open'); }
+
+/* ---------------------------------------------------------------------
+ * SECTION I — the decile-fan SVG. Pure string template, coloured with
+ * var(--token) so a theme flip repaints it via CSS alone (no JS redraw).
+ * ------------------------------------------------------------------- */
+var DECILE_KEYS = ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9'];
+
+function fanSVGMarkup(reg) {
+  var d = reg.forecast.deciles;
+  var vals = DECILE_KEYS.map(function (k) { return d[k]; });
+  vals.push(reg.baselines.naive.point, reg.baselines.rw_drift.point);
+  var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  var span = hi - lo;
+  var pad = span > 0 ? span * 0.18 : (Math.abs(hi) * 0.05 || 1);
+  var domainLo = lo - pad, domainHi = hi + pad;
+
+  var W = 680, H = 118, ML = 18, MR = 18;
+  var plotW = W - ML - MR;
+  var cy = 50;
+  function X(v) { return ML + (v - domainLo) / (domainHi - domainLo) * plotW; }
+
+  var bands = [
+    { a: '0.1', b: '0.9', h: 30, cls: 'fan-band-0' },
+    { a: '0.2', b: '0.8', h: 22, cls: 'fan-band-1' },
+    { a: '0.3', b: '0.7', h: 15, cls: 'fan-band-2' },
+    { a: '0.4', b: '0.6', h: 9,  cls: 'fan-band-3' }
+  ];
+  var parts = [];
+  parts.push('<line class="fan-axis" x1="' + ML + '" y1="' + cy + '" x2="' + (W - MR) + '" y2="' + cy + '"/>');
+  bands.forEach(function (b) {
+    var x0 = X(d[b.a]), x1 = X(d[b.b]);
+    var x = Math.min(x0, x1), w = Math.max(1, Math.abs(x1 - x0));
+    parts.push('<rect class="fan-band ' + b.cls + '" x="' + x.toFixed(2) + '" y="' + (cy - b.h / 2) + '" width="' + w.toFixed(2) + '" height="' + b.h + '" rx="2"/>');
+  });
+  var xNaive = X(reg.baselines.naive.point), xRw = X(reg.baselines.rw_drift.point);
+  parts.push('<line class="fan-naive-line" x1="' + xNaive.toFixed(2) + '" y1="' + (cy - 26) + '" x2="' + xNaive.toFixed(2) + '" y2="' + (cy + 26) + '"/>');
+  parts.push('<line class="fan-rw-line" x1="' + xRw.toFixed(2) + '" y1="' + (cy - 26) + '" x2="' + xRw.toFixed(2) + '" y2="' + (cy + 26) + '"/>');
+  var xm = X(d['0.5']);
+  parts.push('<line class="fan-median-line" x1="' + xm.toFixed(2) + '" y1="' + (cy - 22) + '" x2="' + xm.toFixed(2) + '" y2="' + (cy + 22) + '"/>');
+  parts.push('<circle class="fan-median-dot" cx="' + xm.toFixed(2) + '" cy="' + cy + '" r="3.4"/>');
+
+  var x01 = X(d['0.1']), x09 = X(d['0.9']);
+  parts.push('<text class="fan-label" x="' + x01.toFixed(2) + '" y="' + (cy + 42) + '" text-anchor="start">' + esc(fmtVal(d['0.1'])) + '</text>');
+  parts.push('<text class="fan-label strong" x="' + xm.toFixed(2) + '" y="' + (cy + 42) + '" text-anchor="middle">' + esc(fmtVal(d['0.5'])) + '</text>');
+  parts.push('<text class="fan-label" x="' + x09.toFixed(2) + '" y="' + (cy + 42) + '" text-anchor="end">' + esc(fmtVal(d['0.9'])) + '</text>');
+  parts.push('<text class="fan-target" x="' + (W - MR) + '" y="14" text-anchor="end">target ' + esc(reg.target.period) + '</text>');
+
+  var label = 'Decile forecast fan for ' + reg.series.title + ', target ' + reg.target.period +
+    ', median ' + fmtVal(d['0.5']) + ', 80% interval ' + fmtVal(d['0.1']) + ' to ' + fmtVal(d['0.9']);
+  return '<div class="fanwrap"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + parts.join('') + '</svg></div>';
+}
+
+/* ---------------------------------------------------------------------
+ * SECTION I — registration cards.
+ * ------------------------------------------------------------------- */
+function renderRegCard(reg) {
+  var verdict = verdictOf(reg.id);
+  var chip = chipClassFor(verdict);
+  var hv = Lg.verifyRegistrationHash(reg);
+  var shortHash = reg.sha256.slice(0, 14) + '…';
+  var html = '';
+  html += '<div class="inst regcard">';
+  html += '<div class="row"><span class="lab">' + esc(reg.series.title) + '</span><span class="vchip ' + chip + '">' + esc(verdict) + '</span></div>';
+  html += '<div class="subline">' + esc(reg.series.dataset) + ' · ' + esc(dimsText(reg.series.dims)) + ' · ' + esc(reg.series.unit) + '</div>';
+  html += fanSVGMarkup(reg);
+  html += '<div class="legend fanlegend"><span class="sw-median">median &amp; 80/60/40% bands <span class="tag stored">stored</span></span>' +
+          '<span class="sw-naive">naive baseline</span><span class="sw-rw">rw-drift baseline</span></div>';
+  html += '<div class="stats">';
+  html += '<span>target period<b>' + esc(reg.target.period) + '</b></span>';
+  html += '<span>expected release<b>' + esc(reg.target.release.expected) + '</b><span class="sub">grace ' + esc(reg.target.release.grace_days) + 'd</span></span>';
+  // Two different things live under "engine": the CHECKPOINT (the weights —
+  // license-gated, must stay a 2.x Apache-2.0 id) and the VERSION (the
+  // `timesfm` pip package that ran it — tooling, Apache-2.0 at every
+  // version). Headline the weights, because that is what a reader means by
+  // "which model"; the library version stays visible in the sub-line so the
+  // registration remains fully described. Derived from the stored strings,
+  // never hard-coded: the registration is immutable and this is display.
+  var ckm = /timesfm-([0-9.]+)-([0-9]+m)/i.exec(reg.engine.checkpoint || '');
+  var engineHead = ckm ? 'TimesFM ' + ckm[1] + ' \u00b7 ' + ckm[2] : esc(reg.engine.name) + ' ' + esc(reg.engine.version);
+  var engineSub = esc(reg.engine.checkpoint) + ' \u00b7 ' + esc(reg.engine.name) + ' library ' + esc(reg.engine.version);
+  html += '<span>engine<b>' + engineHead + '</b><span class="sub">' + engineSub + '</span></span>';
+  html += '<span>data cutoff<b>' + esc(reg.engine.data_cutoff) + '</b><span class="sub">context ' + esc(reg.engine.context_span) + '</span></span>';
+  html += '<span>naive / rw-drift<b>' + esc(fmtVal(reg.baselines.naive.point)) + ' / ' + esc(fmtVal(reg.baselines.rw_drift.point)) + '</b><span class="tag stored">stored</span></span>';
+  html += '</div>';
+  html += '<div class="ctrl">';
+  html += '<button type="button" class="btn-bare hashbtn" data-full="' + esc(reg.sha256) + '" data-short="' + esc(shortHash) + '" data-expanded="0" title="' + esc(reg.sha256) + '">sha256 ' + esc(shortHash) + '</button>';
+  html += hv.ok
+    ? '<span class="tag live">hash verified, live, right now</span>'
+    : '<span class="tag mismatch">HASH MISMATCH — see console</span>';
+  html += '</div>';
+  if (!hv.ok) console.error('registration hash mismatch', reg.id, hv);
+  html += '<p class="cap">Source: <a href="' + esc(reg.series.source_url) + '" target="_blank" rel="noopener noreferrer">' + esc(reg.series.dataset) + ' API query</a> · committed <span class="num">' + esc(reg.created_utc) + '</span> <span class="tag stored">stored</span></p>';
+  html += '</div>';
+  return html;
+}
+
+function renderRegCards() {
+  var el = $('regCards');
+  if (!REG.registrations.length) { el.innerHTML = '<p class="foot">No registrations in the registry yet.</p>'; return; }
+  var sorted = REG.registrations.slice().sort(function (a, b) { return a.created_utc < b.created_utc ? -1 : a.created_utc > b.created_utc ? 1 : 0; });
+  el.innerHTML = sorted.map(renderRegCard).join('');
+}
+
+/* hash-reveal: tap toggles short <-> full; hover shows full via native title */
+document.addEventListener('click', function (ev) {
+  var btn = ev.target.closest && ev.target.closest('.hashbtn');
+  if (!btn) return;
+  var expanded = btn.getAttribute('data-expanded') === '1';
+  btn.textContent = 'sha256 ' + (expanded ? btn.getAttribute('data-short') : btn.getAttribute('data-full'));
+  btn.setAttribute('data-expanded', expanded ? '0' : '1');
+});
+
+/* ---------------------------------------------------------------------
+ * SECTION II — scoreboard.
+ * ------------------------------------------------------------------- */
+function renderScoreboard() {
+  var agg = Lg.aggregate(REG.registrations, REG.outcomes);
+  var upcoming = Lg.upcomingGradings(REG.registrations, REG.outcomes);
+  var el = $('scoreboard');
+  var html = '';
+  html += '<div class="row"><span class="lab">Verdict counts <span class="tag live">live</span></span>' +
+    '<span class="sub">' + agg.total + ' registration' + (agg.total === 1 ? '' : 's') + ' total</span></div>';
+  html += '<div class="stats" style="margin-top:10px">';
+  html += '<span>open<b class="num">' + agg.counts.OPEN + '</b></span>';
+  html += '<span>scored<b class="num">' + agg.counts.SCORED + '</b></span>';
+  html += '<span>unevaluable<b class="num">' + agg.counts.UNEVALUABLE + '</b></span>';
+  html += '</div>';
+
+  if (agg.scoredCount === 0) {
+    html += '<p class="empty-scoreboard"><span class="n">0</span> verdicts · scoreboard empty by design · precedence before performance</p>';
+    html += '<p class="cap">Nothing below is graded yet because nothing below <i>can be</i> yet — every registration above is waiting on data that has not been published. That is deliberate: this instrument proves precedence by committing a forecast before the number exists, not by finding a favourable window to backtest against afterward.</p>';
+    if (upcoming.length) {
+      html += '<h3 style="margin-top:18px">Next expected gradings</h3><ul class="gradelist">';
+      upcoming.forEach(function (u) {
+        html += '<li><b class="num">' + esc(u.expected) + '</b><span>' + esc(u.title) + ' — target ' + esc(u.target) + '</span></li>';
+      });
+      html += '</ul>';
+    }
+  } else {
+    var covPct = agg.empiricalCoverage80 == null ? null : agg.empiricalCoverage80 * 100;
+    html += '<h3 style="margin-top:18px">80% interval coverage <span class="tag live">live</span></h3>';
+    html += '<p class="cap">Empirical share of SCORED registrations whose registered [f<sub>0.1</sub>, f<sub>0.9</sub>] interval actually contained the outturn, against the nominal 80% the deciles are supposed to deliver. The black tick marks nominal; the bar is what actually happened.</p>';
+    html += '<div class="covbar"><div class="fill" style="width:' + Math.max(0, Math.min(100, covPct)).toFixed(1) + '%"></div><div class="nominal" style="left:80%"></div></div>';
+    html += '<div class="stats"><span>empirical coverage<b class="num">' + fmtPct(agg.empiricalCoverage80, 1) + '</b><span class="tag live">live</span></span>' +
+      '<span>nominal coverage<b class="num">80.0%</b></span>' +
+      '<span>scored registrations<b class="num">' + agg.scoredCount + '</b></span></div>';
+
+    html += '<h3 style="margin-top:20px">Mean pinball loss by series <span class="tag live">live</span></h3>';
+    html += '<div class="tablewrap" style="overflow-x:auto"><table class="led"><thead><tr><th>Series</th><th>n</th><th>mean pinball</th><th>median abs err (model)</th><th>naive abs err</th><th>rw-drift abs err</th></tr></thead><tbody>';
+    Object.keys(agg.bySeries).sort().forEach(function (slug) {
+      var s = agg.bySeries[slug];
+      html += '<tr><td data-col="Series" class="n">' + esc(slug) + '</td>' +
+        '<td data-col="n">' + s.n + '</td>' +
+        '<td data-col="mean pinball">' + s.pinball_mean.toFixed(4) + '</td>' +
+        '<td data-col="median abs err">' + s.abs_err_median_mean.toFixed(4) + '</td>' +
+        '<td data-col="naive abs err">' + s.naive_abs_err_mean.toFixed(4) + '</td>' +
+        '<td data-col="rw-drift abs err">' + s.rw_drift_abs_err_mean.toFixed(4) + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '<p class="cap">Pinball loss and absolute error are different units (a nine-decile average vs one point-forecast error) and are never divided into each other here — the naive/rw-drift columns exist so a reader can see, series by series, whether the model’s median beat a baseline that requires no model at all.</p>';
+  }
+  el.innerHTML = html;
+}
+
+/* ---------------------------------------------------------------------
+ * SECTION III — the ledger table + corrections.
+ * ------------------------------------------------------------------- */
+function renderLedgerTable() {
+  var tbody = $('ledgerRows');
+  var sorted = REG.registrations.slice().sort(function (a, b) { return a.created_utc < b.created_utc ? -1 : a.created_utc > b.created_utc ? 1 : 0; });
+  if (!sorted.length) { tbody.innerHTML = '<tr><td colspan="6" class="n">No registrations yet.</td></tr>'; return; }
+  tbody.innerHTML = sorted.map(function (reg) {
+    var verdict = verdictOf(reg.id);
+    var chip = chipClassFor(verdict);
+    var shortHash = reg.sha256.slice(0, 10) + '…';
+    return '<tr>' +
+      '<td data-col="ID" class="n">' + esc(reg.id) + '</td>' +
+      '<td data-col="Series">' + esc(reg.series.slug) + '</td>' +
+      '<td data-col="Target" class="n">' + esc(reg.target.period) + '</td>' +
+      '<td data-col="Committed" class="n">' + esc(reg.created_utc) + '</td>' +
+      '<td data-col="SHA-256" class="hash" title="' + esc(reg.sha256) + '">' + esc(shortHash) + '</td>' +
+      '<td data-col="Status"><span class="vchip ' + chip + '">' + esc(verdict) + '</span></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderCorrections() {
+  var el = $('correctionsList');
+  if (!REG.corrections.length) {
+    el.innerHTML = '<p>No corrections have been filed. Corrections appear here, dated, the moment any are — the original registration they refer to is never edited.</p>';
+    return;
+  }
+  var sorted = REG.corrections.slice().sort(function (a, b) { return (a.date || '') < (b.date || '') ? -1 : 1; });
+  el.innerHTML = '<table class="led"><thead><tr><th>Date</th><th>Applies to</th><th>Correction</th></tr></thead><tbody>' +
+    sorted.map(function (c) {
+      return '<tr><td data-col="Date" class="n">' + esc(c.date) + '</td><td data-col="Applies to" class="n">' + esc(c.applies_to) + '</td><td data-col="Correction">' + esc(c.text) + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+/* ---------------------------------------------------------------------
+ * SECTION IV — self-test. Re-runs the same closed-form checks as
+ * ledger.test.js (kept independent, not required()-shared, so a bug that
+ * only manifests in the browser bundle still gets caught), plus a live
+ * pass over the REAL embedded registry's hashes.
+ * ------------------------------------------------------------------- */
+function runSelfTest() {
+  $('selfTestBtn').disabled = true;
+  $('selfTestSummary').textContent = 'Running…';
+  $('selfTestOut').textContent = '';
+  setTimeout(function () {
+    var lines = [], pass = 0, fail = 0;
+    function check(name, ok, detail) {
+      if (ok) pass++; else fail++;
+      lines.push((ok ? 'PASS' : 'FAIL') + '  ' + name + (detail ? '  — ' + detail : ''));
+    }
+
+    /* 1. pinball loss closed forms */
+    check('pinballLoss(10,8,0.5) === 1.0', Lg.pinballLoss(10, 8, 0.5) === 1.0);
+    check('pinballLoss(10,12,0.5) === 1.0', Lg.pinballLoss(10, 12, 0.5) === 1.0);
+    check('pinballLoss(1,0,0.9) === 0.9 (under-forecast, high quantile)', Math.abs(Lg.pinballLoss(1, 0, 0.9) - 0.9) < 1e-12);
+    check('pinballLoss(0,1,0.9) === 0.1 (over-forecast, high quantile)', Math.abs(Lg.pinballLoss(0, 1, 0.9) - 0.1) < 1e-12);
+
+    /* 2. hand-computed fan: f_q = 10q, y = 5 -> mean 4/9 */
+    var fan = {};
+    Lg.DECILES.forEach(function (q) { fan[q.toFixed(1)] = +(10 * q).toFixed(1); });
+    var pm = Lg.pinballMean(5, fan);
+    check('pinballMean(5, {f_q=10q}) === 4/9', Math.abs(pm - 4 / 9) < 1e-9, pm.toFixed(6));
+    check('interval80Hit boundary: y===f0.1 counts as a hit', Lg.interval80Hit(1, fan) === true);
+    check('interval80Hit boundary: y===f0.9 counts as a hit', Lg.interval80Hit(9, fan) === true);
+    check('interval80Hit: outside the interval is a miss', Lg.interval80Hit(9.5, fan) === false);
+
+    /* 3. canonicalize + sha256: NIST vectors + round-trip + tamper */
+    check('sha256Hex("") matches the NIST empty-string vector',
+      Lg.sha256Hex('') === 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+    check('sha256Hex("abc") matches the NIST vector',
+      Lg.sha256Hex('abc') === 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+    var sample = { fcreg: '0.1', id: 'x', forecast: { deciles: fan } };
+    var h = Lg.sha256Hex(Lg.canonicalize(sample));
+    var withHash = { fcreg: '0.1', id: 'x', forecast: { deciles: fan }, sha256: h };
+    var vOk = Lg.verifyRegistrationHash(withHash);
+    check('verifyRegistrationHash: round-trip on a fresh hash verifies', vOk.ok === true);
+    var tampered = { fcreg: '0.1', id: 'x', forecast: { deciles: { '0.1': 999 } }, sha256: h };
+    var vBad = Lg.verifyRegistrationHash(tampered);
+    check('verifyRegistrationHash: a tampered field fails verification', vBad.ok === false);
+
+    /* 4. aggregate on a synthetic mini-registry */
+    var regs = [
+      { id: 'r1', series: { slug: 'a' }, forecast: { deciles: fan }, baselines: { naive: { point: 4 }, rw_drift: { point: 6 } } },
+      { id: 'r2', series: { slug: 'a' }, forecast: { deciles: fan }, baselines: { naive: { point: 4 }, rw_drift: { point: 6 } } }
+    ];
+    var m1 = Lg.scoreRegistration(regs[0], 5), m2 = Lg.scoreRegistration(regs[1], 9.5);
+    var agg = Lg.aggregate(regs, [{ id: 'r1', verdict: 'SCORED', metrics: m1 }, { id: 'r2', verdict: 'SCORED', metrics: m2 }]);
+    check('aggregate: SCORED=2, OPEN=0 on a fully-scored mini-registry', agg.counts.SCORED === 2 && agg.counts.OPEN === 0);
+    check('aggregate: empirical80 coverage = 1/2 (only r1 hits)', Math.abs(agg.empiricalCoverage80 - 0.5) < 1e-12);
+    var aggEmpty = Lg.aggregate(regs, []);
+    check('aggregate: zero outcomes -> empiricalCoverage80 is null, not 0', aggEmpty.empiricalCoverage80 === null);
+
+    /* 5. the REAL embedded registry: every stored hash re-verified live */
+    lines.push('');
+    lines.push('Live hash re-verification of the ' + REG.registrations.length + ' registration(s) embedded in this page:');
+    REG.registrations.forEach(function (reg) {
+      var v = Lg.verifyRegistrationHash(reg);
+      check('sha256 of ' + reg.id + ' matches its own fields', v.ok, v.ok ? v.computed.slice(0, 16) + '…' : ('expected ' + v.expected + ' got ' + v.computed));
+    });
+
+    var summary = pass + ' / ' + (pass + fail) + ' checks passed, live, just now.';
+    $('selfTestSummary').textContent = summary;
+    $('selfTestOut').textContent = lines.join('\n');
+    $('selfTestBtn').disabled = false;
+  }, 20);
+}
+
+/* ---------------------------------------------------------------------
+ * Boot.
+ * ------------------------------------------------------------------- */
+function boot() {
+  renderRegCards();
+  renderScoreboard();
+  renderLedgerTable();
+  renderCorrections();
+  $('selfTestBtn').addEventListener('click', runSelfTest);
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+})();
+
+</script>

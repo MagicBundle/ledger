@@ -1,0 +1,242 @@
+{
+  "generated_utc": "2026-09-01T17:57:12Z",
+  "registrations": [
+    {
+      "fcreg": "0.1",
+      "id": "ea-hicp--2026-09--r1",
+      "series": {
+        "slug": "ea-hicp",
+        "title": "Euro area HICP, all-items, annual rate of change",
+        "dataset": "prc_hicp_minr",
+        "dims": {
+          "coicop18": "TOTAL",
+          "unit": "RCH_A",
+          "geo": "EA21"
+        },
+        "unit": "% (annual rate of change)",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?coicop18=TOTAL&format=JSON&geo=EA21&lang=EN&unit=RCH_A"
+      },
+      "target": {
+        "period": "2026-09",
+        "release": {
+          "expected": "2026-10-01",
+          "calendar_source": "assumption: Eurostat's prc_hicp_minr HICP table posts a reference month's all-items annual rate on/around the first calendar day of the following month \u2014 empirically verified on 2026-09-01, when the 2026-08 value was already present in a fresh fetch. grace_days=30 absorbs calendar drift (weekends, holidays, revisions to the release calendar).",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "2000-12..2026-08",
+        "data_cutoff": "2026-08"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 2.7919580936431885,
+          "0.2": 2.9774913787841797,
+          "0.3": 3.0623509883880615,
+          "0.4": 3.129940986633301,
+          "0.5": 3.1994895935058594,
+          "0.6": 3.261514902114868,
+          "0.7": 3.3296971321105957,
+          "0.8": 3.422785997390747,
+          "0.9": 3.6140167713165283
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 3.2
+        },
+        "rw_drift": {
+          "point": 3.2019480519480523
+        }
+      },
+      "created_utc": "2026-09-01T17:39:42Z",
+      "sha256": "757cd251ca0003bf2c2c170c561b655767694263b0df8bb21fadc5ceaedc09cb"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "ea-unemp--2026-08--r1",
+      "series": {
+        "slug": "ea-unemp",
+        "title": "Euro area unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "EA21",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=EA21&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-30",
+          "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "2000-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 6.324240207672119,
+          "0.2": 6.3573408126831055,
+          "0.3": 6.368929386138916,
+          "0.4": 6.373193740844727,
+          "0.5": 6.398936748504639,
+          "0.6": 6.4229736328125,
+          "0.7": 6.4230756759643555,
+          "0.8": 6.439525604248047,
+          "0.9": 6.493844032287598
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 6.4
+        },
+        "rw_drift": {
+          "point": 6.3902515723270445
+        }
+      },
+      "created_utc": "2026-09-01T17:35:21Z",
+      "sha256": "0363a37d061dc961c46063f939cd6d04e448a533d9f1c0af8f1fc3d7c2c94d65"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-debt--2026-Q2--r1",
+      "series": {
+        "slug": "lu-debt",
+        "title": "Luxembourg general government gross debt",
+        "dataset": "gov_10q_ggdebt",
+        "dims": {
+          "geo": "LU",
+          "sector": "S13",
+          "na_item": "GD",
+          "unit": "MIO_EUR"
+        },
+        "unit": "million EUR",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt?format=JSON&geo=LU&lang=EN&na_item=GD&sector=S13&unit=MIO_EUR"
+      },
+      "target": {
+        "period": "2026-Q2",
+        "release": {
+          "expected": "2026-10-20",
+          "calendar_source": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt \u2014 empirically verified release lag: the 2026-Q1 observation carried a dataset 'updated' stamp of 2026-07-21, exactly 112 calendar days after the 2026-Q1 quarter-end (2026-03-31), matching Eurostat's documented T+112-day release convention for quarterly government debt. grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "1998-Q1..2026-Q1",
+        "data_cutoff": "2026-Q1"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 22902.734375,
+          "0.2": 23557.37109375,
+          "0.3": 23983.19921875,
+          "0.4": 24390.5703125,
+          "0.5": 24738.4375,
+          "0.6": 25052.1953125,
+          "0.7": 25552.2421875,
+          "0.8": 26486.6953125,
+          "0.9": 27926.59375
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 26402.1
+        },
+        "rw_drift": {
+          "point": 26622.44732142857
+        }
+      },
+      "created_utc": "2026-09-01T17:35:21Z",
+      "sha256": "7e00a2af39e5fbeb8f332bc13afdae75cdf4f09ea82e71b00548e88eb23a189c"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-unemp--2026-08--r1",
+      "series": {
+        "slug": "lu-unemp",
+        "title": "Luxembourg unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "LU",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=LU&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-30",
+          "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "1983-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 6.923365592956543,
+          "0.2": 7.017150402069092,
+          "0.3": 7.051187515258789,
+          "0.4": 7.076803684234619,
+          "0.5": 7.114014148712158,
+          "0.6": 7.1474456787109375,
+          "0.7": 7.189540386199951,
+          "0.8": 7.2644147872924805,
+          "0.9": 7.343601226806641
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 7.1
+        },
+        "rw_drift": {
+          "point": 7.10727969348659
+        }
+      },
+      "created_utc": "2026-09-01T17:35:21Z",
+      "sha256": "4181f939e696972e127676e29f1d4f95845c44e7eeccb760329e51fb38fe4d93"
+    }
+  ],
+  "outcomes": [],
+  "corrections": [],
+  "stats": {
+    "n_open": 4,
+    "n_scored": 0,
+    "n_unevaluable": 0,
+    "coverage80": {
+      "empirical": null,
+      "nominal": 0.8
+    },
+    "mean_pinball_by_series": {}
+  }
+}

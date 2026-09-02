@@ -1,0 +1,217 @@
+/* =====================================================================
+ * suite/chassis/chassis.css
+ * The shared page chassis for the STEM instruments suite.
+ *
+ * Extracted verbatim-in-spirit from the three shipped pages
+ *   repulsion/page/body.html  (zeta zeros / GUE)
+ *   arctic/page/body.html     (Aztec diamond)
+ *   fever/page/body.html      (Ising model)
+ * after three review rounds.  What lives here is what all three copied
+ * byte-for-byte; per-page series/accent colours are documented below as
+ * SLOTS a page overrides, not baked in.
+ *
+ * Concatenation recipe (see README.md): a page's <style> is
+ *   chassis.css   +   the page's own :root{ ...series slots... }   +
+ *   any page-specific component CSS (panels, lensbox, filmstrip, ...).
+ * The page block comes AFTER chassis.css so its slot overrides win.
+ * ===================================================================== */
+
+/* ---------------------------------------------------------------------
+ * 1 · STRUCTURAL PALETTE  — identical across all three pages.
+ *     Light is defined on bare :root.  Dark is redefined twice: once
+ *     under prefers-color-scheme guarded by :not([data-theme="light"])
+ *     so an explicit light choice wins over the OS, and once under
+ *     [data-theme="dark"] so an explicit dark toggle wins either way.
+ *     Never give any token its ONLY definition inside a media block.
+ * ------------------------------------------------------------------- */
+:root{
+  --bg:#F2F3F5; --bg2:#E9EBEF; --card:#FFFFFF;
+  --ink:#15181F; --ink2:#5E6472;
+  /* --ink3 is the WCAG-AA correction shipped in Fever.  Repulsion and
+   * Arctic first used #9AA1AE, which fell below the 3:1 non-text / 4.5:1
+   * text floor on --card; Fever darkened it to #7D8088 (light) and kept
+   * a matching dark-mode value.  This is the value the suite standardises on. */
+  --ink3:#7D8088;
+  --line:#D3D7DE;
+  --acc:#2F5AA8; --acc-soft:#DDE6F5;
+
+  /* shared reference-mark + control tokens (Fever + Arctic use all four;
+   * Repulsion needs none of them, but they are structural, not series) */
+  --curve:#15181F;                 /* the exact/theory curve, ink-strong */
+  --ctl:#8A8A93;                   /* a muted control / secondary line   */
+  --ctl-soft:#E4E2E6;              /* fill behind a control / shaded band */
+
+  /* the LIVE / EXACT / STORED / NUMERICAL vocabulary is suite-wide, so its
+   * chip colours are chassis tokens, NOT page series slots.  (Fever wired
+   * these to its --meas / --acc / --eye; naming them here frees the chips
+   * from any one page's palette.) */
+  --live:#157F7A;                  /* measured in-browser, right now */
+  --exact:#2F5AA8;                 /* closed form of the infinite system */
+  --numerical:#6A3EA1;             /* literature value, no closed form */
+  /* STORED reuses --ink3 (a neutral, "from the recorded run") */
+
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --bg2:#0B0D10; --card:#0E1013;
+  --ink:#C9D4DD; --ink2:#8A96A5; --ink3:#6E7A88; --line:#232A34;
+  --acc:#86AEEC; --acc-soft:#182233;
+  --curve:#FFFFFF; --ctl:#7C7691; --ctl-soft:#262430;
+  --live:#58C6C0; --exact:#86AEEC; --numerical:#C4A0EE;
+}}
+:root[data-theme="dark"]{
+  --bg:#000000; --bg2:#0B0D10; --card:#0E1013;
+  --ink:#C9D4DD; --ink2:#8A96A5; --ink3:#6E7A88; --line:#232A34;
+  --acc:#86AEEC; --acc-soft:#182233;
+  --curve:#FFFFFF; --ctl:#7C7691; --ctl-soft:#262430;
+  --live:#58C6C0; --exact:#86AEEC; --numerical:#C4A0EE;
+}
+
+/* ---------------------------------------------------------------------
+ * 2 · PAGE SERIES SLOTS  — placeholders only; OVERRIDE PER PAGE.
+ *     Each page defines its own data-series accents after chassis.css,
+ *     in BOTH light and the two dark blocks, and lists them in its
+ *     readColors() VARS.  The neutral fallbacks below keep an
+ *     un-themed page legible rather than transparent.
+ *
+ *     What each page actually defines (for reference):
+ *       Repulsion : --zeta --gue --poi
+ *       Arctic    : --ns --ns2 --ew --ew2 --play
+ *       Fever     : --up --down --fever --meas --play --eye
+ *
+ *     --play (the "you"/human colour in a game) recurs in Arctic + Fever,
+ *     so it is given a real default here; the rest are page-specific.
+ * ------------------------------------------------------------------- */
+:root{
+  --play:#7A3FA8;                  /* the human player's colour (>=2 pages) */
+  --s1:#2F5AA8; --s2:#157F7A; --s3:#A34D62; --s4:#A8681C;  /* generic slots */
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --play:#C78BE8;
+  --s1:#86AEEC; --s2:#58C6C0; --s3:#D07C8F; --s4:#E5B267;
+}}
+:root[data-theme="dark"]{
+  --play:#C78BE8;
+  --s1:#86AEEC; --s2:#58C6C0; --s3:#D07C8F; --s4:#E5B267;
+}
+
+/* ---------------------------------------------------------------------
+ * 3 · DOCUMENT SKELETON
+ * ------------------------------------------------------------------- */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.5;padding:0 20px 96px}
+.wrap{max-width:920px;margin:0 auto}
+
+h1{font-family:var(--serif);font-weight:300;font-size:4.4rem;letter-spacing:-.01em;line-height:1;margin:72px 0 18px;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:400;font-size:1.7rem;line-height:1.2;margin:0 0 6px;text-wrap:balance}
+h3{font-family:var(--sans);font-weight:600;font-size:.92rem;letter-spacing:.01em;margin:26px 0 0}
+p{max-width:64ch;margin:.6em 0}
+.lede{font-size:1.3rem;font-weight:300;max-width:56ch;color:var(--ink);line-height:1.35}
+.lede i{font-style:italic}
+.eyebrow{font-family:var(--sans);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);font-weight:500}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+section{margin-top:72px;padding-top:28px;border-top:1px solid var(--line)}
+.inst{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 20px 16px;margin-top:18px}
+canvas{display:block;width:100%}
+
+/* ---------------------------------------------------------------------
+ * 4 · ROW / LABEL / CAPTION
+ * ------------------------------------------------------------------- */
+.row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.lab{font-family:var(--sans);font-size:.82rem;font-weight:500;letter-spacing:.02em}
+/* colour a label by adding a page class, e.g. .lab.f{color:var(--fever)} */
+.sub{font-family:var(--sans);font-size:.78rem;color:var(--ink2)}
+.sub b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.cap{font-family:var(--sans);font-size:.78rem;color:var(--ink2);margin-top:10px;max-width:78ch}
+.cap b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+/* ---------------------------------------------------------------------
+ * 5 · LEGEND  (line / dashed-theory / dot / ring / swatch variants)
+ * ------------------------------------------------------------------- */
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--sans);font-size:.8rem;color:var(--ink2);margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:18px;height:2px;vertical-align:middle;margin-right:7px;background:currentColor}
+.legend .th::before{height:0;border-top:2px dashed currentColor}
+.legend .dot::before{width:9px;height:9px;border-radius:50%}
+.legend .ring::before{width:9px;height:9px;border-radius:50%;background:transparent;border:2px solid currentColor;box-sizing:content-box}
+.legend.sw span::before{width:22px;height:12px;border-radius:2px;vertical-align:-2px;border:1px solid var(--ink3)}
+/* semantic colour helpers a page may reuse; series colours (.z .g .ns …)
+ * are added by the page's own CSS block */
+.legend .k{color:var(--curve)}.legend .c{color:var(--ctl)}
+.legend .a{color:var(--acc)}.legend .pl{color:var(--play)}
+
+/* ---------------------------------------------------------------------
+ * 6 · CONTROLS  (buttons, selects, range, focus ring)
+ * ------------------------------------------------------------------- */
+button,select{font-family:var(--sans);font-size:.82rem;font-weight:500;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:3px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--ink3)}
+button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button.primary{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+button[disabled]{opacity:.5;cursor:default}
+.ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+
+/* ---------------------------------------------------------------------
+ * 7 · DIAL  (a slider paired with a big monospace read-out + tick marks)
+ * ------------------------------------------------------------------- */
+.dial{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin-top:8px}
+.dial .big{font-family:var(--mono);font-size:2.4rem;line-height:1;font-weight:400;white-space:nowrap}
+.marks{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;font-family:var(--sans);font-size:.74rem;color:var(--ink2);margin-top:4px}
+.marks b{font-weight:500;color:var(--ink)}
+
+/* ---------------------------------------------------------------------
+ * 8 · TAG CHIPS  — the suite's LIVE / EXACT / STORED / NUMERICAL vocabulary
+ * ------------------------------------------------------------------- */
+.tag{font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:2px;padding:1px 6px;color:var(--ink2);white-space:nowrap;max-width:100%}
+.tag.live{border-color:var(--live);color:var(--live)}
+.tag.exact{border-color:var(--exact);color:var(--exact)}
+.tag.stored{border-color:var(--ink3)}
+.tag.numerical{border-color:var(--numerical);color:var(--numerical)}
+@media (max-width:820px){.tag{white-space:normal}}
+
+/* ---------------------------------------------------------------------
+ * 9 · GAME  (verdict line, score row)
+ * ------------------------------------------------------------------- */
+.game .verdict,.verdict{margin-top:12px;min-height:2.6em;font-size:1.02rem}
+.game .verdict{min-height:3.2em}
+.score{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px;font-family:var(--sans);font-size:.85rem;color:var(--ink2)}
+.score b{font-family:var(--mono);color:var(--ink);font-weight:500;font-size:1.05rem}
+.score .pl b{color:var(--play)}
+/* the Repulsion/Fever multiple-choice card, reused where a game offers picks */
+.game .choice{display:block;width:100%;background:transparent;border:1px solid var(--line);border-radius:4px;padding:10px 12px 6px;margin-top:10px;text-align:left;cursor:pointer}
+.game .choice:hover{border-color:var(--ink3)}
+.game .choice .lab{color:var(--ink2)}
+.game .choice.correct{border-color:var(--live)}
+.game .choice.wrong{border-color:var(--numerical)}
+.game .choice[disabled]{cursor:default}
+
+/* ---------------------------------------------------------------------
+ * 10 · FOOT / PROVENANCE + the visually-hidden helper
+ * ------------------------------------------------------------------- */
+.foot{font-size:.9rem;color:var(--ink2);max-width:70ch}
+.foot a{color:inherit}
+.foot b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* Bare button: strips native chrome so an inline-looking control can still
+ * be a real <button> (keyboard + AT reachable).  from: sunflower review —
+ * the .marks landmark shortcuts had to become buttons and each page was
+ * re-declaring this reset.  Add your own look on top; keyboard focus still
+ * gets the shared :focus-visible ring below. */
+.btn-bare{background:none;border:0;margin:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:inherit}
+.btn-bare:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+
+/* ---------------------------------------------------------------------
+ * 11 · RESPONSIVE + reduced motion
+ * ------------------------------------------------------------------- */
+@media (max-width:640px){
+  h1{font-size:3rem}
+  body{font-size:17px}
+  .inst{padding:14px}
+  .dial{grid-template-columns:1fr}
+  .dial .big{font-size:2rem}
+}
+@media (prefers-reduced-motion: reduce){.nomotion{display:none}}

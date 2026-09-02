@@ -1,0 +1,232 @@
+{
+  "note": "FIXTURE for building/testing the Ledger page only -- not a real pre-registration. No offline pipeline run has produced data/registry/ledger.json yet; when it does, build.js reads that instead of this file.",
+  "registrations": [
+    {
+      "fcreg": "0.1",
+      "id": "ea-hicp--2026-08--r1",
+      "series": {
+        "slug": "ea-hicp",
+        "title": "Euro area HICP, all-items, annual rate of change",
+        "dataset": "prc_hicp_manr",
+        "dims": {
+          "geo": "EA20",
+          "coicop": "CP00",
+          "unit": "RCH_A"
+        },
+        "unit": "% annual rate of change",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_manr?format=JSON&geo=EA20&coicop=CP00&unit=RCH_A"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-17",
+          "calendar_source": "stated assumption: Eurostat’s regular monthly HICP release, ~17th of the following month (flash estimate)",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "1.2.7",
+        "checkpoint": "google/timesfm-2.0-500m-pytorch",
+        "context_span": "1997-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 1.7,
+          "0.2": 1.85,
+          "0.3": 1.95,
+          "0.4": 2.05,
+          "0.5": 2.1,
+          "0.6": 2.15,
+          "0.7": 2.25,
+          "0.8": 2.35,
+          "0.9": 2.5
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 2
+        },
+        "rw_drift": {
+          "point": 2.05
+        }
+      },
+      "created_utc": "2026-09-01T12:00:00Z",
+      "sha256": "35c3565850c78bb58fcd73c5e11272f219ac14bbdcab64c1b2bac0236617a504"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-unemp--2026-08--r1",
+      "series": {
+        "slug": "lu-unemp",
+        "title": "Luxembourg unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "LU",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?format=JSON&geo=LU&s_adj=SA&age=TOTAL&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-30",
+          "calendar_source": "stated assumption: Eurostat’s regular monthly unemployment release, ~30-day publication lag",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "1.2.7",
+        "checkpoint": "google/timesfm-2.0-500m-pytorch",
+        "context_span": "2000-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 5.3,
+          "0.2": 5.4,
+          "0.3": 5.5,
+          "0.4": 5.55,
+          "0.5": 5.6,
+          "0.6": 5.65,
+          "0.7": 5.7,
+          "0.8": 5.8,
+          "0.9": 5.9
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 5.6
+        },
+        "rw_drift": {
+          "point": 5.65
+        }
+      },
+      "created_utc": "2026-09-01T12:00:00Z",
+      "sha256": "6316fc1fdf19fd24cbdebf334198b8715abf55adb8ef2f12832fee17b6500b4e"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "ea-unemp--2026-08--r1",
+      "series": {
+        "slug": "ea-unemp",
+        "title": "Euro area (EA20) unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "EA20",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?format=JSON&geo=EA20&s_adj=SA&age=TOTAL&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-08",
+        "release": {
+          "expected": "2026-09-30",
+          "calendar_source": "stated assumption: Eurostat’s regular monthly unemployment release, ~30-day publication lag",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "1.2.7",
+        "checkpoint": "google/timesfm-2.0-500m-pytorch",
+        "context_span": "2000-01..2026-07",
+        "data_cutoff": "2026-07"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 5.9,
+          "0.2": 5.95,
+          "0.3": 6,
+          "0.4": 6.05,
+          "0.5": 6.1,
+          "0.6": 6.15,
+          "0.7": 6.2,
+          "0.8": 6.25,
+          "0.9": 6.35
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 6.1
+        },
+        "rw_drift": {
+          "point": 6.12
+        }
+      },
+      "created_utc": "2026-09-01T12:00:00Z",
+      "sha256": "f6d6daefa6460f8b5a009b5c31e2a45e4ef7eedb51eff45b7478c4f7c6793679"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-debt--2026-Q2--r1",
+      "series": {
+        "slug": "lu-debt",
+        "title": "Luxembourg general government gross debt (Maastricht definition)",
+        "dataset": "gov_10q_ggdebt",
+        "dims": {
+          "geo": "LU",
+          "sector": "S13",
+          "na_item": "GD",
+          "unit": "MIO_EUR"
+        },
+        "unit": "million EUR",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt?format=JSON&geo=LU&sector=S13&na_item=GD&unit=MIO_EUR"
+      },
+      "target": {
+        "period": "2026-Q2",
+        "release": {
+          "expected": "2026-10-22",
+          "calendar_source": "stated assumption: Eurostat’s quarterly government debt release, ~3-month lag after quarter-end (Jan/Apr/Jul/Oct)",
+          "grace_days": 45
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "1.2.7",
+        "checkpoint": "google/timesfm-2.0-500m-pytorch",
+        "context_span": "1999-Q1..2026-Q1",
+        "data_cutoff": "2026-Q1"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 16200,
+          "0.2": 16400,
+          "0.3": 16550,
+          "0.4": 16700,
+          "0.5": 16800,
+          "0.6": 16900,
+          "0.7": 17050,
+          "0.8": 17200,
+          "0.9": 17450
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 16700
+        },
+        "rw_drift": {
+          "point": 16850
+        }
+      },
+      "created_utc": "2026-09-01T12:00:00Z",
+      "sha256": "d6bb3cecaea8efb2b888a75ea85c85ecc7d665baa61ff0334f83e3472aba17c2"
+    }
+  ],
+  "outcomes": [],
+  "corrections": []
+}

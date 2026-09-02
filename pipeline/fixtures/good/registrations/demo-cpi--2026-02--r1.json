@@ -1,0 +1,22 @@
+{
+  "fcreg": "0.1",
+  "id": "demo-cpi--2026-02--r1",
+  "series": {
+    "slug": "demo-cpi",
+    "title": "Demo CPI (fixture)",
+    "dataset": "demo_dataset",
+    "dims": {"geo": "XX", "unit": "PCH"},
+    "unit": "index points",
+    "source_url": "https://example.invalid/api/demo_dataset?geo=XX&unit=PCH"
+  },
+  "target": {
+    "period": "2026-02",
+    "release": {"expected": "2026-03-15", "calendar_source": "https://example.invalid/calendar", "grace_days": 30}
+  },
+  "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+  "engine": {"name": "timesfm", "version": "1.2.3", "checkpoint": "google/timesfm-1.0-200m", "context_span": "2015-01..2026-01", "data_cutoff": "2026-01-31"},
+  "forecast": {"deciles": {"0.1": 88, "0.2": 90, "0.3": 92, "0.4": 94, "0.5": 96, "0.6": 98, "0.7": 100, "0.8": 102, "0.9": 104}},
+  "baselines": {"naive": {"point": 93}, "rw_drift": {"point": 95}},
+  "created_utc": "2026-02-05T00:00:00Z",
+  "sha256": "627053550da823511dcfa9a6038c2b840b993bb64afde584c89fa7f3295b0244"
+}

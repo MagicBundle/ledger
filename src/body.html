@@ -1,0 +1,182 @@
+<style>
+/* ===================================================================== *
+ * Ledger — page-specific CSS. Concatenated AFTER chassis.css by build.js,
+ * so these :root slot overrides win. Structural palette, skeleton,
+ * controls, tags, legend, table all come from chassis.css; only the
+ * THIRD tag kind ("measured" — the house doctrine's fetched-outturn
+ * label, alongside chassis's existing "stored"/"live"), the verdict
+ * chips (OPEN/SCORED/UNEVALUABLE), and the decile-fan SVG live here.
+ *
+ * The fan charts are inline SVG coloured entirely with var(--token)
+ * fills/strokes, so a theme flip repaints them for free via CSS — unlike
+ * phantom's canvas panels, nothing here needs a JS redraw-on-theme hook.
+ * ===================================================================== */
+:root{
+  --measured:#A8681C;      /* light: a fetched, real-world outturn (warm amber) */
+  --verdict-scored:#157F7A;    /* reuses chassis --live hue: a concluded, graded verdict */
+  --verdict-unevaluable:#A34D62; /* reuses chassis --s3 hue: terminal, not a failure */
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --measured:#E5B267;
+  --verdict-scored:#58C6C0;
+  --verdict-unevaluable:#D07C8F;
+}}
+:root[data-theme="dark"]{
+  --measured:#E5B267;
+  --verdict-scored:#58C6C0;
+  --verdict-unevaluable:#D07C8F;
+}
+
+.tag.measured{border-color:var(--measured);color:var(--measured)}
+.tag.mismatch{border-color:var(--verdict-unevaluable);color:var(--verdict-unevaluable);font-weight:600}
+
+/* .stats is NOT a chassis.css component (every sibling page defines it
+ * itself); copied here in the same shape phantom/arctic/fever use. */
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px;font-family:var(--sans);font-size:.8rem;color:var(--ink2)}
+.stats span{max-width:38ch}
+.stats b{font-family:var(--mono);color:var(--ink);font-weight:500;font-size:1.02rem;display:block}
+.stats .sub{display:block;margin-top:2px}
+.stats .sub b{display:inline;font-size:inherit}
+
+/* ---- verdict chips (OPEN / SCORED / UNEVALUABLE) ---- */
+.vchip{font-family:var(--sans);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;
+  border:1px solid;border-radius:12px;padding:2px 10px;white-space:nowrap;font-weight:500}
+.vchip.open{border-color:var(--ink3);color:var(--ink3)}
+.vchip.scored{border-color:var(--verdict-scored);color:var(--verdict-scored)}
+.vchip.unevaluable{border-color:var(--verdict-unevaluable);color:var(--verdict-unevaluable)}
+
+/* ---- registration cards + decile fan ---- */
+.stack{display:flex;flex-direction:column;gap:16px;margin-top:18px}
+.regcard .row{align-items:flex-start}
+.regcard .subline{font-family:var(--sans);font-size:.78rem;color:var(--ink2);margin-top:2px}
+.fanwrap{margin:14px 0 4px}
+.fanwrap svg{display:block;width:100%;height:auto;overflow:visible}
+.fan-band{fill:var(--acc)}
+.fan-band-0{opacity:.14}
+.fan-band-1{opacity:.24}
+.fan-band-2{opacity:.38}
+.fan-band-3{opacity:.58}
+.fan-axis{stroke:var(--ink3);stroke-width:1}
+.fan-tick{stroke:var(--ink3);stroke-width:1}
+.fan-median-line{stroke:var(--acc);stroke-width:2}
+.fan-median-dot{fill:var(--acc)}
+.fan-naive-line{stroke:var(--ink3);stroke-width:1.4;stroke-dasharray:3 2}
+.fan-rw-line{stroke:var(--numerical, var(--s1));stroke-width:1.4;stroke-dasharray:1 2}
+.fan-label{font:500 10px var(--mono);fill:var(--ink2)}
+.fan-label.strong{fill:var(--ink);font-weight:600}
+.fan-target{font:500 10px var(--mono);fill:var(--ink2)}
+.fanlegend{margin-top:2px}
+.fanlegend .sw-median::before{background:var(--acc)}
+.fanlegend .sw-naive::before{content:"";display:inline-block;width:14px;border-top:1.4px dashed var(--ink3);margin-right:7px;vertical-align:middle}
+.fanlegend .sw-rw::before{content:"";display:inline-block;width:14px;border-top:1.4px dashed var(--s1, var(--numerical));margin-right:7px;vertical-align:middle}
+
+.hashbtn{font-family:var(--mono);font-size:.76rem;color:var(--ink2);background:var(--bg2);
+  border:1px solid var(--line);border-radius:3px;padding:4px 9px;cursor:pointer}
+.hashbtn:hover{border-color:var(--ink3);color:var(--ink)}
+@media (pointer:coarse){.hashbtn{padding:9px 12px}}
+
+/* ---- scoreboard: the deliberate empty state ---- */
+.empty-scoreboard{font-family:var(--sans);font-size:1.05rem;font-weight:500;color:var(--ink);
+  letter-spacing:.01em;margin:6px 0 2px}
+.empty-scoreboard .n{color:var(--verdict-scored);font-family:var(--mono)}
+.gradelist{list-style:none;margin:10px 0 0;padding:0;font-family:var(--sans);font-size:.85rem;color:var(--ink2)}
+.gradelist li{padding:5px 0;border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.gradelist li:last-child{border-bottom:0}
+.gradelist b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+.covbar{position:relative;height:10px;background:var(--bg2);border-radius:5px;overflow:visible;margin:10px 0 4px;max-width:420px}
+.covbar .fill{position:absolute;left:0;top:0;bottom:0;background:var(--verdict-scored);border-radius:5px}
+.covbar .nominal{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+
+table.led{border-collapse:collapse;font-family:var(--sans);font-size:.78rem;margin-top:10px;width:100%}
+table.led th,table.led td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.led th{color:var(--ink2);font-weight:500}
+table.led td.n{font-family:var(--mono);white-space:nowrap}
+table.led td.hash{font-family:var(--mono);color:var(--ink2)}
+@media (max-width:700px){
+  table.led,table.led tbody,table.led tr,table.led td,table.led th{display:block;width:100%}
+  /* Hide the header via its OWN element, not ":first-child" -- that
+   * selector matches per-parent, so on a table with a <thead>, the
+   * tbody's genuinely first DATA row is ALSO a first-child (of tbody)
+   * and would be silently hidden right along with the header row. Caught
+   * live: on a narrow viewport this ate the append-only ledger's oldest
+   * registration entirely. */
+  table.led thead{display:none}
+  table.led tr{border-bottom:1px solid var(--line);padding:8px 0}
+  table.led td{border:0;padding:2px 0}
+  table.led td::before{content:attr(data-col) ": ";color:var(--ink2)}
+}
+
+.notebox{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--acc);
+  border-radius:3px;padding:12px 16px;margin:16px 0;font-family:var(--sans);font-size:.86rem;
+  color:var(--ink2);max-width:74ch}
+.notebox b{color:var(--ink);font-weight:600}
+.formula{font-family:var(--mono);font-size:.92rem;background:var(--bg2);border:1px solid var(--line);
+  border-radius:3px;padding:10px 14px;margin:10px 0;overflow-x:auto;white-space:pre}
+
+@media (max-width:640px){
+  .fanwrap svg{overflow:hidden}
+}
+</style>
+
+<div class="wrap">
+<div class="eyebrow" style="margin-top:64px">An instrument · pre-registered forecasts · graded in public</div>
+<h1>Ledger</h1>
+<p class="lede">The forecast that grades itself.</p>
+<p>Every forecast below is <b>pre-registered</b>: committed as an immutable, hash-stamped JSON file <i>before</i> the target period's data exists, then graded in public once it arrives. A verdict is either <b>SCORED</b> or <b>UNEVALUABLE</b> — and UNEVALUABLE is terminal: late beyond its grace window, discontinued, redefined, or vintage-conflicted, it can never later become SCORED. Any correction is appended, dated, alongside the original — never edited into it. This page runs <b>no backtests, ever</b>: a foundation forecaster's pretraining can already contain the very history a backtest would score it against, so a backtest proves nothing about forward skill on data the model may have already seen — only real, dated precedence, committed before the fact, can.</p>
+<noscript><p class="foot">This page needs JavaScript to render the registry, compute the scoreboard, and run its self-test — nothing here is server-rendered.</p></noscript>
+
+<!-- ============================================================ I -->
+<section>
+<div class="eyebrow">I · Open registrations</div>
+<h2>Committed before the data exists</h2>
+<p>Each series below carries a <b>decile forecast fan</b> — nine quantiles (0.1 through 0.9) registered for the next unpublished period, before that period's number exists anywhere. The shaded bands nest the 80/60/40% intervals around the <span class="fan-median-swatch">median</span>; the dashed lines mark this cycle's two registered baselines (naive: last observed value; rw-drift: naive plus the recent trend) for comparison once grading happens. Every number on a card is <span class="tag stored">stored</span> — committed at the timestamp shown, hash-stamped, and re-verified live in your browser against that hash below each card.</p>
+<div class="stack" id="regCards"><p class="foot">Loading registry…</p></div>
+</section>
+
+<!-- ============================================================ II -->
+<section>
+<div class="eyebrow">II · Scoreboard</div>
+<h2>Graded in public</h2>
+<p>Once a target period's data is published, its registration is scored: pinball loss across all nine deciles, whether the 80% interval actually contained the outturn, and the median forecast's absolute error against the two registered baselines. Everything below is <span class="tag live">live</span> — computed in your browser, right now, from the registry embedded in this page, by the same scoring kernel shipped in <code>ledger.js</code> and covered by the self-test in section IV.</p>
+<div class="inst" id="scoreboard"><p class="foot">Computing…</p></div>
+</section>
+
+<!-- ============================================================ III -->
+<section>
+<div class="eyebrow">III · The ledger</div>
+<h2>Append-only</h2>
+<p>Every registration this instrument has ever committed, in one table, oldest first. Nothing here is ever deleted or rewritten — a wrong forecast stays visible exactly as filed; only <b>corrections</b> (below the table, dated, appended) can add context after the fact.</p>
+<div class="inst">
+<div class="tablewrap" style="overflow-x:auto">
+<table class="led" id="ledgerTable">
+  <thead><tr><th>ID</th><th>Series</th><th>Target</th><th>Committed</th><th>SHA-256</th><th>Status</th></tr></thead>
+  <tbody id="ledgerRows"></tbody>
+</table>
+</div>
+</div>
+<h3>Corrections</h3>
+<div id="correctionsList" class="foot">Loading…</div>
+</section>
+
+<!-- ============================================================ IV -->
+<section>
+<div class="eyebrow">IV · Method &amp; self-test</div>
+<h2>How scoring works</h2>
+<p>Pinball (quantile) loss scores one decile <i>q</i> against the realised outturn <i>y</i> and the registered forecast <i>f<sub>q</sub></i>:</p>
+<div class="formula">L_q(y, f_q) = (y − f_q)·q          if y ≥ f_q
+            = (f_q − y)·(1 − q)    otherwise</div>
+<p><code>pinball_mean</code> is the average of <i>L<sub>q</sub></i> over all nine registered deciles. <code>interval80_hit</code> is true iff <i>f<sub>0.1</sub> ≤ y ≤ f<sub>0.9</sub></i> — whether the registered 80% interval actually contained what happened. <code>abs_err_median</code> is <i>|y − f<sub>0.5</sub>|</i>, reported alongside the naive and random-walk-with-drift baselines' own absolute errors (never pooled into one "skill score" — a point-forecast absolute error and a nine-decile pinball mean are not the same unit, so they are shown side by side, not divided into each other).</p>
+<p class="notebox"><b>Vintage policy (verbatim).</b> "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict." A statistical office restating an old quarter's figure next year does not reopen last year's already-SCORED verdict — the number that was live on the day this instrument checked is the number that gets graded, permanently.</p>
+<h3 style="margin-top:22px">Self-test</h3>
+<p class="foot">Re-verify, right now, in this browser: the pinball-loss closed forms, the interval-hit boundary cases, the canonical-JSON + SHA-256 hash (round-trip <i>and</i> tamper detection), the registry aggregates on a synthetic mini-registry, and — using the real embedded registry, not a synthetic stand-in — that every registration's <code>sha256</code> field genuinely matches a fresh hash of its own fields.</p>
+<div class="inst">
+  <div class="ctrl"><button type="button" id="selfTestBtn">Run self-test</button><span class="sub" id="selfTestSummary">Not run yet.</span></div>
+  <div class="foot" id="selfTestOut" role="status" aria-live="polite" style="margin-top:12px;white-space:pre-wrap;font-family:var(--mono);font-size:.78rem"></div>
+</div>
+<h3>What is stored, measured, live</h3>
+<p class="foot"><span class="tag stored">stored</span> — registered and committed: the forecast deciles, the baselines, the engine/checkpoint, the hash. Written once, at registration time, and never edited. <span class="tag measured">measured</span> — a fetched outturn: the real-world number, once published, that a registration is graded against. <span class="tag live">live</span> — computed in your browser from the embedded registry at the moment this page renders: every scoreboard aggregate, every hash re-verification, every self-test result.</p>
+<p class="foot">Registry: <a href="https://github.com/MagicBundle/ledger" rel="noopener">github.com/MagicBundle/ledger</a> — every registration, outcome and correction is a public commit. The repository's commit graph, not any field inside a file, is the timestamp that makes a forecast pre-registered.</p>
+<p class="foot">Contact the author: <a href="mailto:info@iterativeintelligence.io">info@iterativeintelligence.io</a></p>
+</section>
+</div>
