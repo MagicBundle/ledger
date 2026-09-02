@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- The Ledger daily cycle as a launchd job. NOT INSTALLED by default:
+       macOS denies a launchd-spawned /bin/bash access to ~/Documents unless
+       /bin/bash holds Full Disk Access (System Settings > Privacy & Security),
+       a grant only the user should make — see RUNBOOK.md §7. The daily run is
+       driven by the Claude Code scheduled task `ledger-daily` instead; this
+       file is kept as the ready alternative. To install after granting access:
+         launchctl bootout gui/$(id -u)/io.iterativeintelligence.ledger
+         cp pipeline/io.iterativeintelligence.ledger.plist ~/Library/LaunchAgents/
+         launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.iterativeintelligence.ledger.plist
+       Fires at 07:45 local time every day. If the Mac was asleep at 07:45,
+       launchd runs the job on wake (missed calendar events are coalesced into
+       one run). If the Mac was powered off, the missed run is NOT replayed —
+       the daily cadence plus the watchdog cover that. -->
+  <key>Label</key>
+  <string>io.iterativeintelligence.ledger</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/jeromeverony/Documents/Claude Code projects/Exploration/ledger/pipeline/cycle.sh</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>7</integer>
+    <key>Minute</key>
+    <integer>45</integer>
+  </dict>
+  <key>WorkingDirectory</key>
+  <string>/Users/jeromeverony/Documents/Claude Code projects/Exploration/ledger</string>
+  <key>StandardOutPath</key>
+  <string>/Users/jeromeverony/Documents/Claude Code projects/Exploration/ledger/pipeline/logs/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/jeromeverony/Documents/Claude Code projects/Exploration/ledger/pipeline/logs/launchd.err.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/Users/jeromeverony/.nvm/versions/node/v20.20.2/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>HOME</key>
+    <string>/Users/jeromeverony</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>

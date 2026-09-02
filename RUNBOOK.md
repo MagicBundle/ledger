@@ -60,15 +60,17 @@ filters below and one hard-coded string in the pipeline.
 
 ## 1. QUICK CARD — one screen
 
-Run these five commands, in this order, every cycle. `<slug>` and `<period>` come
-from the "what's due" table in §2.
+**Since 2026-09-02 this whole card runs unattended every day — see §7.** By hand, it is
+these five commands, in this order. `register` derives each series' target itself (the
+period after the latest published observation) and refuses to re-register a target that
+already has an `r1`; `--allow-rerun` is the deliberate exception.
 
 ```
 cd "/Users/jeromeverony/Documents/Claude Code projects/Exploration/ledger/pipeline"
 source .venv/bin/activate
 
-python ledger_pipeline.py score --all                       # grade anything whose data has landed
-python ledger_pipeline.py register --series <slug> --target <period>   # commit next forecast(s)
+python ledger_pipeline.py score                             # grade anything whose data has landed
+python ledger_pipeline.py register --series all              # next period per series; SKIPs what is already registered
 python ledger_pipeline.py compile                            # rebuild data/registry/ledger.json
 cd .. && node src/build.js                                   # rebuild index.html
 open index.html                                              # REVIEW LOCALLY, run the on-page self-test
@@ -171,11 +173,10 @@ Because you register one period ahead and score one period behind, in steady sta
 every monthly sitting does both halves at once for the monthly series, and the
 quarterly series only has something to do one sitting in four:
 
-1. `score --all` — grades any registration whose release date has passed and whose
+1. `score` — grades every open registration whose release date has passed and whose
    data is now fetchable (writes `outcomes/<id>.json`, or marks `UNEVALUABLE` per §4).
-2. `register --series <slug> --target <next-period>` — for each series whose current
-   open registration has just been scored, immediately register the following
-   period. This is what keeps you always ~1 release-cycle ahead of every deadline.
+2. `register --series all` — registers the following period for every series whose
+   new observation has been published; SKIPs the rest. This is what keeps you always ~1 release-cycle ahead of every deadline.
 3. `compile`, `node src/build.js`, review, commit, push — as in §1.
 
 ### 2.6 Re-verifying the live API yourself
@@ -255,10 +256,10 @@ source .venv/bin/activate
 #    write an immutable, hash-stamped registrations/<id>.json. Refuses to run if
 #    <id> already exists (fcreg immutability) or if data for <target> already
 #    exists (you'd be registering with foresight — the whole point is you can't).
-python ledger_pipeline.py register --series ea-hicp   --target 2026-09
-python ledger_pipeline.py register --series lu-unemp  --target 2026-08
-python ledger_pipeline.py register --series ea-unemp  --target 2026-08
-python ledger_pipeline.py register --series lu-debt   --target 2026-Q2
+python ledger_pipeline.py register --series ea-hicp
+python ledger_pipeline.py register --series lu-unemp
+python ledger_pipeline.py register --series ea-unemp
+python ledger_pipeline.py register --series lu-debt
 
 # 2. score — for one id or --all: if today >= release.expected, try to fetch the
 #    outturn; if found, compute the verdict + metrics (SCORING MATH in the main
@@ -266,7 +267,7 @@ python ledger_pipeline.py register --series lu-debt   --target 2026-Q2
 #    so; if release.expected + grace_days has passed with nothing fetchable, mark
 #    UNEVALUABLE:late.
 python ledger_pipeline.py score --id ea-hicp--2026-08--r1
-python ledger_pipeline.py score --all
+python ledger_pipeline.py score
 
 # 3. compile — read every registrations/*.json + outcomes/*.json + corrections/*.json,
 #    write the single summary data/registry/ledger.json (counts, coverage, pinball,
@@ -475,3 +476,53 @@ applies: build `ledger/index.html` and open it locally first (§1), and once syn
 open the site's local dev build of `/instruments/ledger/` and `/instruments/` (the
 gallery) before committing anything in the `site` repo. Nothing here is pushed sight
 unseen.
+
+---
+
+## 7. Automation — the cycle runs itself (installed 2026-09-02)
+
+`pipeline/cycle.sh` is the whole monthly card as one idempotent script: `score`,
+then `register --series all` (SKIP is normal — a new registration is minted only on
+the first run after a series' next observation is published; the pipeline refuses
+to re-register a target that already has an `r1` unless `--allow-rerun` is passed
+deliberately), and if the registry changed: `compile`, `node src/build.js`,
+`reference_check.py` (must PASS), `ledger.test.js` (must pass), commit + push this
+repository, then sync ONLY the Ledger page into the site repository
+(`SYNC_ONLY=ledger`) and push that. Nothing is pushed if verification fails. Every
+run writes `pipeline/logs/status.json` and a dated `pipeline/logs/cycle-YYYY-MM-DD.log`;
+a failure also writes `pipeline/logs/LAST-FAILURE` and posts a macOS notification.
+`CYCLE_DRY=1` runs everything except commit/push. The model runs offline
+(`HF_HUB_OFFLINE=1`) from the cached 2.5 checkpoint — an unattended run can never
+pull different weights. Run it by hand at any time: `bash pipeline/cycle.sh`.
+
+Two schedulers drive it, so that a single failure is visible rather than silent:
+
+**Primary — the `ledger-daily` scheduled task in the Claude Code app, 07:45 every
+day.** It runs `bash pipeline/cycle.sh` and reports in two or three lines. It runs
+while the app is open; a slot missed while the app was closed runs at the next
+launch. Because registering happens on the first day the data is available (about a
+month before that target's own release), a missed day or two never threatens a
+deadline — only the app staying closed for weeks would.
+
+**Watchdog — the `ledger-watchdog` scheduled task, Mondays and Thursdays 09:00.**
+Reads `status.json`, re-runs the cycle if it is stale (>3 days) or failed for a
+transient reason, checks the invariant that every series has at least one OPEN
+registration, checks both repositories are fully pushed (a plain `git push` if
+not), and lists open registrations whose release is within 7 days. It never edits
+the registry by hand and never force-pushes.
+
+**Why not launchd/cron.** `pipeline/io.iterativeintelligence.ledger.plist` is a
+working launchd definition for the same 07:45 run, and it was installed and tested
+on 2026-09-02 — macOS refused it: a launchd-spawned `/bin/bash` may not read
+`~/Documents` ("Operation not permitted", the Files-and-Folders privacy control)
+unless `/bin/bash` is granted Full Disk Access in System Settings → Privacy &
+Security. That is a system security setting and a broad grant, so it was not made.
+If you ever want a scheduler independent of the Claude app, grant it yourself and
+reinstall the job:
+
+```
+cp pipeline/io.iterativeintelligence.ledger.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.iterativeintelligence.ledger.plist
+```
+
+The scheduled tasks and the plist all run the same script, so nothing else changes.

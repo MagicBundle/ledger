@@ -406,8 +406,16 @@ def build_registration(
   forecast_fn: Callable[[list[float]], dict[str, float]] = timesfm_forecast_deciles,
   reg_dir: Path = REGISTRATIONS_DIR,
   now: Optional[dt.datetime] = None,
+  allow_rerun: bool = False,
 ) -> tuple[dict, list[tuple[str, float]], dict]:
   """Fetches the live history, forecasts h=1, and assembles a registration.
+
+  Refuses — before any model call — if this (slug, target) is already
+  registered, unless allow_rerun=True. Without this guard a repeated
+  `register` (an unattended daily run, a retried shell command) would mint
+  r2, r3, ... for the same target: duplicate forecasts, each a real hash-
+  stamped commitment. Re-registration is a deliberate act (after a
+  correction, say) and must be asked for explicitly with --allow-rerun.
 
   Returns (registration_dict, history, fetch_meta) — the caller is
   responsible for writing the registration and, if desired, a snapshot of
@@ -422,6 +430,13 @@ def build_registration(
   target_period = next_period(last_period, cfg["freq"])
   expected_iso, calendar_note = expected_release_for_series(slug, target_period)
 
+  first = reg_dir / f"{slug}--{target_period}--r1.json"
+  if first.exists() and not allow_rerun:
+    raise RegistrationExistsError(
+      f"{slug}: target {target_period} is already registered ({first.name}); "
+      "nothing new to forecast until the next observation is published "
+      "(pass --allow-rerun to deliberately mint another revision)"
+    )
   reg_id = next_registration_id(slug, target_period, reg_dir=reg_dir)
   values = [v for _, v in history]
 
@@ -480,7 +495,7 @@ def cmd_register(args: argparse.Namespace) -> int:
       print(f"[register] SKIP {slug}: unknown series slug", file=sys.stderr)
       continue
     try:
-      reg, history, meta = build_registration(slug)
+      reg, history, meta = build_registration(slug, allow_rerun=bool(getattr(args, 'allow_rerun', False)))
       path = write_registration(reg)
       # Internal (non-schema) snapshot used later by `score` for
       # vintage-conflict / definition-change checks. Not part of fcreg.
@@ -815,6 +830,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
   p_register = sub.add_parser("register", help="compute + write immutable registrations")
   p_register.add_argument("--series", default="all", help="'all' or a comma-separated list of slugs")
+  p_register.add_argument("--allow-rerun", action="store_true",
+                          help="mint r<n+1> for a target that is already registered (deliberate re-registration only)")
   p_register.set_defaults(func=cmd_register)
 
   p_score = sub.add_parser("score", help="grade open, due registrations")

@@ -437,5 +437,30 @@ def main() -> int:
   return 0 if failed == 0 else 1
 
 
+def test_build_registration_refuses_a_second_registration_for_the_same_target():
+  """A repeated register must SKIP, never mint r2 — the unattended daily
+  cycle depends on this. --allow-rerun is the deliberate escape hatch."""
+  with tempfile.TemporaryDirectory() as tmp:
+    tmp_path = Path(tmp)
+    hist = [("2026-05", 6.0), ("2026-06", 6.1), ("2026-07", 6.2)]
+    fetch_fn = lambda dataset, dims: (hist, {"source_url": "x", "updated": "2026-09-01"})
+    forecast_fn = lambda values: {q: values[-1] for q in lp.DECILES}
+    reg, _, _ = lp.build_registration("ea-unemp", fetch_fn=fetch_fn, forecast_fn=forecast_fn, reg_dir=tmp_path)
+    lp.write_registration(reg, reg_dir=tmp_path)
+    assert reg["id"] == "ea-unemp--2026-08--r1"
+    calls = {"n": 0}
+    def counting_forecast(values):
+      calls["n"] += 1
+      return forecast_fn(values)
+    try:
+      lp.build_registration("ea-unemp", fetch_fn=fetch_fn, forecast_fn=counting_forecast, reg_dir=tmp_path)
+      raise AssertionError("second registration for the same target was not refused")
+    except lp.RegistrationExistsError:
+      pass
+    assert calls["n"] == 0, "the model must not run when the target is already registered"
+    reg2, _, _ = lp.build_registration("ea-unemp", fetch_fn=fetch_fn, forecast_fn=counting_forecast, reg_dir=tmp_path, allow_rerun=True)
+    assert reg2["id"] == "ea-unemp--2026-08--r2"
+
+
 if __name__ == "__main__":
   raise SystemExit(main())

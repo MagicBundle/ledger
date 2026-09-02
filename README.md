@@ -19,7 +19,9 @@ appended and dated; nothing already written is ever edited in place.
 Four series, one quarter/month ahead (`h=1`): `ea-hicp` (euro-area HICP annual rate),
 `lu-unemp` / `ea-unemp` (unemployment rate, SA), and `lu-debt` (Luxembourg quarterly
 government gross debt — the "Luxembourg's Scissors" flagship). See `RUNBOOK.md` for the
-exact dataset codes, release calendars, and the operator's monthly cycle.
+exact dataset codes, release calendars, and the monthly cycle — which since 2026-09-02
+runs unattended every day (`pipeline/cycle.sh` under launchd, with a scheduled watchdog;
+RUNBOOK §7).
 
 Built 2026-09-01 across several build passes (site chassis + kernel, offline pipeline, this
 reference check). **Public since 2026-09-02**: this directory is the repository
