@@ -22,9 +22,10 @@ government gross debt — the "Luxembourg's Scissors" flagship). See `RUNBOOK.md
 exact dataset codes, release calendars, and the operator's monthly cycle.
 
 Built 2026-09-01 across several build passes (site chassis + kernel, offline pipeline, this
-reference check). **Not yet live**: `ledger/` is not inside any git repository yet, so
-nothing registered so far has a public, independently-checkable timestamp — see `RUNBOOK.md`
-§4 for what that requires before the precedence claim above means anything. **Synced to the site on 2026-09-02**: served at `/instruments/ledger/`, with a gallery card
+reference check). **Public since 2026-09-02**: this directory is the repository
+[github.com/MagicBundle/ledger](https://github.com/MagicBundle/ledger) (public). Its commit
+graph is the timestamp; the four initial registrations entered it in the first commit, before
+any of their release dates — see `RUNBOOK.md` §4 for the per-cycle push deadline. **Synced to the site on 2026-09-02**: served at `/instruments/ledger/`, with a gallery card
 under its own cluster and a computed miniature in the homepage preview cycler (the sync list
 and card live in `site/scripts/sync-content.mjs` and `site/src/data/instruments.js`). See "Resolved 2026-09-01" below for the
 canonical-JSON history.

@@ -340,7 +340,11 @@ provider's server, or an admittedly ignorable git-authorship spoof, are cheaper
 to fake than a repository's own append-only commit graph on a server you don't
 control).
 
-**Current state, checked 2026-09-01: `ledger/` is not inside any git repository.**
+**Current state: since 2026-09-02 `ledger/` IS a git repository with a public remote,
+`github.com/MagicBundle/ledger` (first push 2026-09-02T05:37Z, ahead of every release
+below). The one-time setup that follows is therefore done; it stays here as the record.**
+
+**As originally found, 2026-09-01: `ledger/` was not inside any git repository.**
 `Exploration/` (the parent) is not a repo either — only its `site/` subdirectory is
 (pushing to `github.com/MagicBundle/iterativeintelligence`, and CLAUDE.md forbids
 touching that directory). Before the precedence contract means anything, `ledger/`
