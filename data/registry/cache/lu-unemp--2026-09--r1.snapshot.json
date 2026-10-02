@@ -1,25 +1,6 @@
 {
-  "slug": "lu-unemp",
-  "dataset": "une_rt_m",
-  "dims": {
-    "geo": "LU",
-    "s_adj": "SA",
-    "age": "TOTAL",
-    "sex": "T",
-    "unit": "PC_ACT"
-  },
-  "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=LU&lang=EN&s_adj=SA&sex=T&unit=PC_ACT",
-  "label": "Unemployment by sex and age - monthly data",
-  "updated": "2026-10-01T11:00:00+0200",
-  "dim_labels": {
-    "geo": "Luxembourg",
-    "s_adj": "Seasonally adjusted data, not calendar adjusted data",
-    "age": "Total",
-    "sex": "Total",
-    "unit": "Percentage of population in the labour force"
-  },
-  "fetched_utc": "2026-10-02T05:51:29Z",
-  "series": [
+  "id": "lu-unemp--2026-09--r1",
+  "history": [
     {
       "period": "1983-01",
       "value": 3.3
@@ -2116,5 +2097,18 @@
       "period": "2026-08",
       "value": 7.3
     }
-  ]
+  ],
+  "meta": {
+    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=LU&lang=EN&s_adj=SA&sex=T&unit=PC_ACT",
+    "label": "Unemployment by sex and age - monthly data",
+    "updated": "2026-10-01T11:00:00+0200",
+    "dim_labels": {
+      "geo": "Luxembourg",
+      "s_adj": "Seasonally adjusted data, not calendar adjusted data",
+      "age": "Total",
+      "sex": "Total",
+      "unit": "Percentage of population in the labour force"
+    },
+    "fetched_utc": "2026-10-02T05:51:29Z"
+  }
 }

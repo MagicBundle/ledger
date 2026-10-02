@@ -408,7 +408,7 @@ table.led td.hash{font-family:var(--mono);color:var(--ink2)}
 
 <script id="registryData" type="application/json">
 {
-  "generated_utc": "2026-09-01T17:57:12Z",
+  "generated_utc": "2026-10-02T05:51:33Z",
   "registrations": [
     {
       "fcreg": "0.1",
@@ -524,6 +524,63 @@ table.led td.hash{font-family:var(--mono);color:var(--ink2)}
     },
     {
       "fcreg": "0.1",
+      "id": "ea-unemp--2026-09--r1",
+      "series": {
+        "slug": "ea-unemp",
+        "title": "Euro area unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "EA21",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=EA21&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-09",
+        "release": {
+          "expected": "2026-10-30",
+          "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "2000-01..2026-08",
+        "data_cutoff": "2026-08"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 6.313893795013428,
+          "0.2": 6.343652725219727,
+          "0.3": 6.3549652099609375,
+          "0.4": 6.359793186187744,
+          "0.5": 6.387281894683838,
+          "0.6": 6.409340858459473,
+          "0.7": 6.409340858459473,
+          "0.8": 6.417936325073242,
+          "0.9": 6.466948509216309
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 6.4
+        },
+        "rw_drift": {
+          "point": 6.390282131661443
+        }
+      },
+      "created_utc": "2026-10-02T05:51:33Z",
+      "sha256": "058bfbc54f4c940ebb1922d1d76a3e28f039fd94464f0ee704921960ac387ec8"
+    },
+    {
+      "fcreg": "0.1",
       "id": "lu-debt--2026-Q2--r1",
       "series": {
         "slug": "lu-debt",
@@ -634,19 +691,138 @@ table.led td.hash{font-family:var(--mono);color:var(--ink2)}
       },
       "created_utc": "2026-09-01T17:35:21Z",
       "sha256": "4181f939e696972e127676e29f1d4f95845c44e7eeccb760329e51fb38fe4d93"
+    },
+    {
+      "fcreg": "0.1",
+      "id": "lu-unemp--2026-09--r1",
+      "series": {
+        "slug": "lu-unemp",
+        "title": "Luxembourg unemployment rate, seasonally adjusted",
+        "dataset": "une_rt_m",
+        "dims": {
+          "geo": "LU",
+          "s_adj": "SA",
+          "age": "TOTAL",
+          "sex": "T",
+          "unit": "PC_ACT"
+        },
+        "unit": "% of active population",
+        "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=LU&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+      },
+      "target": {
+        "period": "2026-09",
+        "release": {
+          "expected": "2026-10-30",
+          "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+          "grace_days": 30
+        }
+      },
+      "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+      "engine": {
+        "name": "timesfm",
+        "version": "3.0.0",
+        "checkpoint": "google/timesfm-2.5-200m-pytorch",
+        "context_span": "1983-01..2026-08",
+        "data_cutoff": "2026-08"
+      },
+      "forecast": {
+        "deciles": {
+          "0.1": 7.120569229125977,
+          "0.2": 7.217135906219482,
+          "0.3": 7.256524085998535,
+          "0.4": 7.289628982543945,
+          "0.5": 7.332001686096191,
+          "0.6": 7.372535228729248,
+          "0.7": 7.41406774520874,
+          "0.8": 7.498126029968262,
+          "0.9": 7.59786319732666
+        }
+      },
+      "baselines": {
+        "naive": {
+          "point": 7.3
+        },
+        "rw_drift": {
+          "point": 7.307648183556405
+        }
+      },
+      "created_utc": "2026-10-02T05:51:32Z",
+      "sha256": "3d749b6f900071de1a3a1f2ab493d19fc1b5702ce6372c4d56555c1f6607ae41"
     }
   ],
-  "outcomes": [],
+  "outcomes": [
+    {
+      "id": "ea-unemp--2026-08--r1",
+      "verdict": "SCORED",
+      "reason": null,
+      "outturn": {
+        "value": 6.4,
+        "fetched_utc": "2026-10-02T05:51:28Z",
+        "vintage_note": "first-published value at first successful fetch on/after release date"
+      },
+      "metrics": {
+        "pinball_mean": 0.007787201139662021,
+        "pinball_by_decile": {
+          "0.1": 0.007575979232788122,
+          "0.2": 0.008531837463378978,
+          "0.3": 0.009321184158325302,
+          "0.4": 0.010722503662109518,
+          "0.5": 0.0005316257476808417,
+          "0.6": 0.009189453124999858,
+          "0.7": 0.006922702789306535,
+          "0.8": 0.007905120849609303,
+          "0.9": 0.009384403228759728
+        },
+        "interval80_hit": true,
+        "abs_err_median": 0.0010632514953616834,
+        "naive_abs_err": 0,
+        "rw_drift_abs_err": 0.009748427672955806
+      },
+      "scored_utc": "2026-10-02T05:51:28Z"
+    },
+    {
+      "id": "lu-unemp--2026-08--r1",
+      "verdict": "SCORED",
+      "reason": null,
+      "outturn": {
+        "value": 7.3,
+        "fetched_utc": "2026-10-02T05:51:28Z",
+        "vintage_note": "first-published value at first successful fetch on/after release date"
+      },
+      "metrics": {
+        "pinball_mean": 0.06142568588256828,
+        "pinball_by_decile": {
+          "0.1": 0.037663440704345685,
+          "0.2": 0.056569919586181606,
+          "0.3": 0.07464374542236323,
+          "0.4": 0.08927852630615228,
+          "0.5": 0.09299292564392081,
+          "0.6": 0.0915325927734374,
+          "0.7": 0.07732172966003405,
+          "0.8": 0.028468170166015484,
+          "0.9": 0.004360122680664079
+        },
+        "interval80_hit": true,
+        "abs_err_median": 0.18598585128784162,
+        "naive_abs_err": 0.20000000000000018,
+        "rw_drift_abs_err": 0.19272030651340977
+      },
+      "scored_utc": "2026-10-02T05:51:28Z"
+    }
+  ],
   "corrections": [],
   "stats": {
     "n_open": 4,
-    "n_scored": 0,
+    "n_scored": 2,
     "n_unevaluable": 0,
     "coverage80": {
-      "empirical": null,
+      "empirical": 1,
       "nominal": 0.8
     },
-    "mean_pinball_by_series": {}
+    "mean_pinball_by_series": {
+      "ea-unemp": 0.007787201139662021,
+      "lu-unemp": 0.06142568588256828
+    }
   }
 }
 </script>

@@ -1,25 +1,6 @@
 {
-  "slug": "ea-unemp",
-  "dataset": "une_rt_m",
-  "dims": {
-    "geo": "EA21",
-    "s_adj": "SA",
-    "age": "TOTAL",
-    "sex": "T",
-    "unit": "PC_ACT"
-  },
-  "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=EA21&lang=EN&s_adj=SA&sex=T&unit=PC_ACT",
-  "label": "Unemployment by sex and age - monthly data",
-  "updated": "2026-10-01T11:00:00+0200",
-  "dim_labels": {
-    "geo": "Euro area \u2013 21 countries (from 2026)",
-    "s_adj": "Seasonally adjusted data, not calendar adjusted data",
-    "age": "Total",
-    "sex": "Total",
-    "unit": "Percentage of population in the labour force"
-  },
-  "fetched_utc": "2026-10-02T05:51:33Z",
-  "series": [
+  "id": "ea-unemp--2026-09--r1",
+  "history": [
     {
       "period": "2000-01",
       "value": 9.5
@@ -1300,5 +1281,18 @@
       "period": "2026-08",
       "value": 6.4
     }
-  ]
+  ],
+  "meta": {
+    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=EA21&lang=EN&s_adj=SA&sex=T&unit=PC_ACT",
+    "label": "Unemployment by sex and age - monthly data",
+    "updated": "2026-10-01T11:00:00+0200",
+    "dim_labels": {
+      "geo": "Euro area \u2013 21 countries (from 2026)",
+      "s_adj": "Seasonally adjusted data, not calendar adjusted data",
+      "age": "Total",
+      "sex": "Total",
+      "unit": "Percentage of population in the labour force"
+    },
+    "fetched_utc": "2026-10-02T05:51:33Z"
+  }
 }

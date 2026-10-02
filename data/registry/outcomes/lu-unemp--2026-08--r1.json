@@ -1,0 +1,29 @@
+{
+  "id": "lu-unemp--2026-08--r1",
+  "verdict": "SCORED",
+  "reason": null,
+  "outturn": {
+    "value": 7.3,
+    "fetched_utc": "2026-10-02T05:51:28Z",
+    "vintage_note": "first-published value at first successful fetch on/after release date"
+  },
+  "metrics": {
+    "pinball_mean": 0.06142568588256828,
+    "pinball_by_decile": {
+      "0.1": 0.037663440704345685,
+      "0.2": 0.056569919586181606,
+      "0.3": 0.07464374542236323,
+      "0.4": 0.08927852630615228,
+      "0.5": 0.09299292564392081,
+      "0.6": 0.0915325927734374,
+      "0.7": 0.07732172966003405,
+      "0.8": 0.028468170166015484,
+      "0.9": 0.004360122680664079
+    },
+    "interval80_hit": true,
+    "abs_err_median": 0.18598585128784162,
+    "naive_abs_err": 0.20000000000000018,
+    "rw_drift_abs_err": 0.19272030651340977
+  },
+  "scored_utc": "2026-10-02T05:51:28Z"
+}

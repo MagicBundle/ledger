@@ -1,0 +1,57 @@
+{
+  "fcreg": "0.1",
+  "id": "lu-unemp--2026-09--r1",
+  "series": {
+    "slug": "lu-unemp",
+    "title": "Luxembourg unemployment rate, seasonally adjusted",
+    "dataset": "une_rt_m",
+    "dims": {
+      "geo": "LU",
+      "s_adj": "SA",
+      "age": "TOTAL",
+      "sex": "T",
+      "unit": "PC_ACT"
+    },
+    "unit": "% of active population",
+    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?age=TOTAL&format=JSON&geo=LU&lang=EN&s_adj=SA&sex=T&unit=PC_ACT"
+  },
+  "target": {
+    "period": "2026-09",
+    "release": {
+      "expected": "2026-10-30",
+      "calendar_source": "assumption: Eurostat publishes the euro-area/member-state unemployment rate approximately 30 calendar days after the reference month ends (Eurostat's own background-note convention for the une_rt_m release). grace_days=30 absorbs calendar drift.",
+      "grace_days": 30
+    }
+  },
+  "vintage_policy": "first-published value at first successful fetch on/after release date scores; later revisions never re-open a verdict",
+  "engine": {
+    "name": "timesfm",
+    "version": "3.0.0",
+    "checkpoint": "google/timesfm-2.5-200m-pytorch",
+    "context_span": "1983-01..2026-08",
+    "data_cutoff": "2026-08"
+  },
+  "forecast": {
+    "deciles": {
+      "0.1": 7.120569229125977,
+      "0.2": 7.217135906219482,
+      "0.3": 7.256524085998535,
+      "0.4": 7.289628982543945,
+      "0.5": 7.332001686096191,
+      "0.6": 7.372535228729248,
+      "0.7": 7.41406774520874,
+      "0.8": 7.498126029968262,
+      "0.9": 7.59786319732666
+    }
+  },
+  "baselines": {
+    "naive": {
+      "point": 7.3
+    },
+    "rw_drift": {
+      "point": 7.307648183556405
+    }
+  },
+  "created_utc": "2026-10-02T05:51:32Z",
+  "sha256": "3d749b6f900071de1a3a1f2ab493d19fc1b5702ce6372c4d56555c1f6607ae41"
+}
