@@ -1,0 +1,29 @@
+{
+  "id": "ea-hicp--2026-09--r1",
+  "verdict": "SCORED",
+  "reason": null,
+  "outturn": {
+    "value": 3.8,
+    "fetched_utc": "2026-10-03T05:51:31Z",
+    "vintage_note": "first-published value at first successful fetch on/after release date"
+  },
+  "metrics": {
+    "pinball_mean": 0.24181540012359606,
+    "pinball_by_decile": {
+      "0.1": 0.10080419063568113,
+      "0.2": 0.16450172424316403,
+      "0.3": 0.2212947034835815,
+      "0.4": 0.2680236053466796,
+      "0.5": 0.3002552032470702,
+      "0.6": 0.32309105873107896,
+      "0.7": 0.32921200752258284,
+      "0.8": 0.3017712020874022,
+      "0.9": 0.16738490581512436
+    },
+    "interval80_hit": false,
+    "abs_err_median": 0.6005104064941404,
+    "naive_abs_err": 0.5999999999999996,
+    "rw_drift_abs_err": 0.5980519480519475
+  },
+  "scored_utc": "2026-10-03T05:51:31Z"
+}

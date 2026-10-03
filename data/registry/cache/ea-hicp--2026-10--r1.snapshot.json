@@ -1,21 +1,6 @@
 {
-  "slug": "ea-hicp",
-  "dataset": "prc_hicp_minr",
-  "dims": {
-    "coicop18": "TOTAL",
-    "unit": "RCH_A",
-    "geo": "EA21"
-  },
-  "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?coicop18=TOTAL&format=JSON&geo=EA21&lang=EN&unit=RCH_A",
-  "label": "Harmonised index of consumer prices (HICP) - ECOICOP ver.2 - indices and rates of change, monthly data",
-  "updated": "2026-10-02T11:00:00+0200",
-  "dim_labels": {
-    "coicop18": "Total",
-    "unit": "Annual rate of change",
-    "geo": "Euro area \u2013 21 countries (from 2026)"
-  },
-  "fetched_utc": "2026-10-03T05:51:31Z",
-  "series": [
+  "id": "ea-hicp--2026-10--r1",
+  "history": [
     {
       "period": "2000-12",
       "value": 2.6
@@ -1256,5 +1241,16 @@
       "period": "2026-09",
       "value": 3.8
     }
-  ]
+  ],
+  "meta": {
+    "source_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?coicop18=TOTAL&format=JSON&geo=EA21&lang=EN&unit=RCH_A",
+    "label": "Harmonised index of consumer prices (HICP) - ECOICOP ver.2 - indices and rates of change, monthly data",
+    "updated": "2026-10-02T11:00:00+0200",
+    "dim_labels": {
+      "coicop18": "Total",
+      "unit": "Annual rate of change",
+      "geo": "Euro area \u2013 21 countries (from 2026)"
+    },
+    "fetched_utc": "2026-10-03T05:51:31Z"
+  }
 }
